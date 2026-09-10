@@ -1,0 +1,2289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reading 20 — Market-Based Valuation: Price and Enterprise Value Multiples</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;600;700;900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F0EBE0;
+  --surface:#E4DDCB;
+  --surface-2:#B3A891;
+  --surface-3:#8F856E;
+  --border:#C4B9A0;
+  --gold:#A38228;
+  --gold-soft:#826613;
+  --green:#2E6F52;
+  --green-soft:#5A9A7C;
+  --rust:#A43F26;
+  --rust-soft:#C4744C;
+  --blue:#3E5F8A;
+  --blue-soft:#6E8FB8;
+  --text:#1B1A17;
+  --text-muted:#3A362E;
+  --text-dim:#6B6152;
+  --radius:10px;
+  --radius-lg:14px;
+  --shadow: 0 8px 24px rgba(60,50,30,.15);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Inter',sans-serif;
+  font-size:15px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:'Roboto Slab',serif; margin:0 0 10px; color:var(--text);}
+a{color:var(--blue);}
+#app{display:flex; min-height:100vh; max-width:1400px; margin:0 auto;}
+
+/* ============ SIDEBAR ============ */
+.sidebar{
+  width:290px; flex-shrink:0; position:sticky; top:0; height:100vh; overflow-y:auto;
+  background:var(--surface); border-right:1px solid var(--border);
+  padding:22px 18px 40px; display:flex; flex-direction:column; gap:16px;
+}
+.brand{display:flex; align-items:flex-start; gap:10px; padding-bottom:4px;}
+.brand-mark{flex-shrink:0; margin-top:2px;}
+.brand-eyebrow{font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.06em; color:var(--gold); font-weight:600;}
+.brand-title{font-family:'Roboto Slab',serif; font-weight:700; font-size:16px; line-height:1.28; margin-top:2px;}
+.sidebar-stats{display:flex; gap:8px;}
+.stat-chip{flex:1; background:var(--surface-2); border-radius:var(--radius); padding:9px 10px; text-align:center;}
+.stat-chip .v{font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:17px; color:var(--gold-soft);}
+.stat-chip .l{font-size:10.5px; color:var(--text-muted); margin-top:1px;}
+.sync-line{font-size:11px; color:var(--text-dim); display:flex; align-items:center; gap:5px; padding:0 2px;}
+.sync-dot{width:6px; height:6px; border-radius:50%; background:var(--green); flex-shrink:0;}
+.nav-group-label{font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.07em; color:var(--text-dim); text-transform:uppercase; margin:6px 2px 2px; font-weight:600;}
+.nav-item{
+  display:flex; align-items:center; gap:9px; width:100%; text-align:left;
+  background:none; border:none; padding:8px 9px; border-radius:8px; cursor:pointer;
+  font-family:'Inter',sans-serif; font-size:13px; color:var(--text-muted); line-height:1.3;
+}
+.nav-item:hover{background:var(--surface-2);}
+.nav-item.active{background:var(--gold); color:#fff; font-weight:600;}
+.nav-item.active .mastery-dot{background:#fff;}
+.mastery-dot{width:8px; height:8px; border-radius:50%; background:var(--border); flex-shrink:0;}
+.mastery-dot.started{background:var(--blue);}
+.mastery-dot.mastered{background:var(--green);}
+.nav-item .code{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--text-dim); flex-shrink:0;}
+.nav-item.active .code{color:#fff;}
+
+/* ============ MAIN ============ */
+.main{flex:1; min-width:0; padding:28px 40px 90px;}
+.view{display:none;}
+.view.active{display:block;}
+.los-tag{
+  display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:11.5px; font-weight:600;
+  color:#fff; background:var(--gold); padding:4px 11px; border-radius:20px; letter-spacing:.03em;
+}
+.module-tag{
+  display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:10.5px; font-weight:600;
+  color:var(--text-dim); background:var(--surface); border:1px solid var(--border); padding:3px 9px; border-radius:20px; margin-left:8px;
+}
+.section-title{font-size:23px; margin:12px 0 4px;}
+.section-sub{color:var(--text-dim); font-size:14px; margin-bottom:22px; max-width:640px;}
+
+.theory{max-width:720px;}
+.theory p{margin:0 0 14px;}
+.theory h4{font-size:15.5px; margin:22px 0 10px; color:var(--gold-soft);}
+.theory ul, .theory ol{margin:0 0 14px; padding-left:22px;}
+.theory li{margin-bottom:7px;}
+.theory strong{color:var(--text);}
+.theory em{color:var(--text-muted);}
+
+.callout{
+  background:var(--surface-2); border-left:3px solid var(--gold); border-radius:0 var(--radius) var(--radius) 0;
+  padding:14px 16px; margin:16px 0; color:var(--text-muted); font-size:14px;
+}
+.callout .callout-label{
+  display:block; font-family:'IBM Plex Mono',monospace; font-size:10.5px; font-weight:500;
+  text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); margin-bottom:6px;
+}
+.callout p:last-child{margin-bottom:0;}
+
+.formula-box{
+  background:var(--surface-3); border-radius:var(--radius-lg); padding:18px 20px; margin:16px 0;
+  font-family:'IBM Plex Mono',monospace; color:#fff; overflow-x:auto;
+}
+.formula-box .label{
+  font-family:'Inter',sans-serif; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em;
+  color:#E4DCC8; margin-bottom:10px; font-weight:600;
+}
+.formula-box .eq{font-size:16px; text-align:center; padding:6px 0; color:#fff;}
+.formula-box .fdef{border-top:1px dashed rgba(255,255,255,.25); margin-top:12px; padding-top:10px; font-size:12px; font-family:'Inter',sans-serif; color:#E4DCC8;}
+.formula-box .fdef div{margin-bottom:4px;}
+.formula-box .fdef b{color:#fff; font-family:'IBM Plex Mono',monospace;}
+.frac{display:inline-block; vertical-align:middle; text-align:center; margin:0 4px;}
+.frac .num{display:block; padding:0 4px 3px; border-bottom:1.5px solid currentColor;}
+.frac .den{display:block; padding:3px 4px 0;}
+
+table.dtable{width:100%; border-collapse:collapse; margin:16px 0; font-size:13.5px;}
+table.dtable th{background:var(--surface-3); color:#fff; text-align:left; padding:9px 12px; font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.03em;}
+table.dtable td{padding:9px 12px; border-bottom:1px solid var(--border); color:var(--text-muted);}
+table.dtable tr:last-child td{border-bottom:none;}
+table.dtable tr:nth-child(even) td{background:var(--surface);}
+table.mini{width:100%; border-collapse:collapse; margin:12px 0; font-size:12.8px; font-family:'IBM Plex Mono',monospace;}
+table.mini th, table.mini td{border:1px solid var(--border); padding:6px 9px; text-align:right;}
+table.mini th{background:var(--surface-3); color:#fff; text-align:right;}
+table.mini td:first-child, table.mini th:first-child{text-align:left; font-family:'Inter',sans-serif; font-weight:500;}
+
+.tag{display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600; padding:2px 9px; border-radius:14px; background:var(--surface-2); color:var(--text-muted);}
+.tag-rust{background:var(--rust); color:#fff;}
+.tag-green{background:var(--green); color:#fff;}
+.tag-gold{background:var(--gold); color:#fff;}
+.tag-blue{background:var(--blue); color:#fff;}
+
+.nudge{
+  display:flex; gap:10px; align-items:flex-start; background:var(--surface); border:1px dashed var(--border); border-radius:var(--radius);
+  padding:12px 14px; margin:16px 0; font-size:13px; color:var(--text-dim);
+}
+.nudge .ic{font-size:17px; flex-shrink:0;}
+.nudge .nudge-text{flex:1; min-width:0;}
+
+.btn{
+  font-family:'Inter',sans-serif; font-size:13px; font-weight:600; padding:9px 16px; border-radius:8px;
+  border:1px solid var(--border); background:var(--surface); color:var(--text); cursor:pointer;
+}
+.btn:hover{filter:brightness(0.97);}
+.btn-primary{background:var(--gold); color:#fff; border-color:var(--gold);}
+.btn-green{background:var(--green); color:#fff; border-color:var(--green);}
+.btn-rust{background:var(--rust); color:#fff; border-color:var(--rust);}
+.btn-ghost{background:transparent;}
+.btn-row{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;}
+
+.kbd{
+  display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600;
+  background:var(--surface-3); color:#fff; padding:2px 7px; border-radius:5px; border-bottom:2px solid rgba(0,0,0,.25);
+}
+.kbd-hint-row{display:flex; gap:18px; flex-wrap:wrap; justify-content:center; margin-top:16px; font-size:11.5px; color:var(--text-dim);}
+.kbd-hint-row span{display:flex; align-items:center; gap:6px;}
+
+.roadmap{display:flex; flex-direction:column; gap:8px; margin:14px 0;}
+.roadmap-item{
+  display:flex; align-items:center; gap:12px; background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:12px 14px; cursor:pointer; text-align:left;
+}
+.roadmap-item:hover{border-color:var(--gold);}
+.roadmap-item .ic{font-size:17px; flex-shrink:0;}
+.roadmap-item .txt{flex:1; min-width:0; display:flex; flex-direction:column; gap:2px;}
+.roadmap-item .ttl{font-weight:600; font-size:13.5px; display:block;}
+.roadmap-item .sub{font-size:11.5px; color:var(--text-dim); display:block;}
+.roadmap-item .arrow{color:var(--text-dim); flex-shrink:0;}
+
+.stat-card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px; text-align:center;}
+.stat-card .v{font-family:'IBM Plex Mono',monospace; font-size:22px; font-weight:600; color:var(--gold-soft);}
+.stat-card .l{font-size:11.5px; color:var(--text-dim); margin-top:3px;}
+.stat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:18px 0;}
+
+/* ============ FLASHCARDS ============ */
+.deck-block{margin:26px 0;}
+.deck-block h3{font-size:15px; color:var(--gold-soft); margin-bottom:10px;}
+.deck-head{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; max-width:640px; margin:0 auto 10px;}
+.deck-progress{font-size:12px; color:var(--text-dim); font-family:'IBM Plex Mono',monospace;}
+.flip-hint{text-align:center; font-size:11.5px; color:var(--text-dim); margin-bottom:8px;}
+.flashcard{perspective:1200px; height:230px; max-width:640px; margin:0 auto 16px; cursor:pointer;}
+.flashcard-inner{position:relative; width:100%; height:100%; transition:transform .5s; transform-style:preserve-3d;}
+.flashcard.flipped .flashcard-inner{transform:rotateY(180deg);}
+.flashcard-face{
+  position:absolute; inset:0; backface-visibility:hidden; border-radius:var(--radius-lg);
+  border:1px solid var(--border); padding:22px 26px; display:flex; flex-direction:column; justify-content:center;
+  box-shadow:var(--shadow); overflow-y:auto;
+}
+.face-front{background:var(--surface);}
+.face-back{background:var(--surface-3); color:#fff; transform:rotateY(180deg); border-color:var(--gold);}
+.face-front .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--gold); letter-spacing:.05em; margin-bottom:10px; font-weight:600;}
+.flashcard-face .txt{font-size:15px; line-height:1.55;}
+.face-back .txt{font-size:14px;}
+.grade-row{display:flex; gap:10px; justify-content:center; max-width:640px; margin:0 auto;}
+.empty-state{text-align:center; padding:40px 20px; color:var(--text-dim); max-width:640px; margin:0 auto;}
+.empty-state .big{font-size:34px; margin-bottom:10px;}
+
+/* ============ QUIZ ============ */
+.quiz-setup{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;}
+.quiz-card{max-width:660px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:22px 24px; box-shadow:var(--shadow);}
+.quiz-progress{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--text-dim); margin-bottom:10px;}
+.quiz-q{font-size:15px; margin-bottom:16px; line-height:1.55;}
+.opt{
+  display:flex; gap:10px; align-items:flex-start; width:100%; text-align:left; background:var(--bg);
+  border:1px solid var(--border); border-radius:var(--radius); padding:12px 14px; margin-bottom:9px; cursor:pointer; font-size:13.5px;
+}
+.opt:hover:not(:disabled){border-color:var(--gold);}
+.opt .oletter{font-family:'IBM Plex Mono',monospace; font-weight:700; color:var(--gold-soft); flex-shrink:0;}
+.opt.correct{background:rgba(46,111,82,0.12); border-color:var(--green); color:var(--green); font-weight:600;}
+.opt.wrong{background:rgba(164,63,38,0.1); border-color:var(--rust); color:var(--rust); font-weight:600;}
+.opt:disabled{cursor:default;}
+.quiz-exp{background:var(--surface-2); border-radius:var(--radius); padding:13px 15px; margin-top:6px; font-size:13.5px; color:var(--text-muted);}
+.quiz-exp .lbl{font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; color:var(--text-dim); margin-bottom:5px; display:block; font-weight:600;}
+.quiz-score{font-family:'IBM Plex Mono',monospace; font-weight:700; color:var(--gold-soft);}
+.wronglist{display:flex; flex-direction:column; gap:8px; margin:14px 0;}
+.wronglist .wl-item{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:10px 13px; font-size:13px;}
+
+/* ============ PRACTICE ============ */
+.practice-card{max-width:720px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px 24px; margin-bottom:20px; box-shadow:var(--shadow);}
+.ph{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;}
+.ph h3{display:inline; font-size:15.5px; margin-left:8px;}
+.done-check{font-size:12px; color:var(--text-dim); display:flex; align-items:center; gap:6px; cursor:pointer;}
+.practice-scenario{font-size:13.5px; color:var(--text-muted); margin-bottom:10px; line-height:1.6;}
+.practice-scenario table{margin:10px 0;}
+.practice-scenario .table-scroll{overflow-x:auto; margin:10px 0;}
+.practice-scenario .table-scroll table{margin:0; min-width:520px;}
+.practice-card details{background:var(--bg); border:1px solid var(--border); border-radius:8px; margin-bottom:8px; padding:9px 13px;}
+.practice-card summary{cursor:pointer; font-size:12.5px; font-weight:600; color:var(--gold-soft); font-family:'IBM Plex Mono',monospace;}
+.practice-card details[open] summary{margin-bottom:8px;}
+.practice-card details .step-body{font-size:13.5px; color:var(--text-muted); line-height:1.6;}
+.practice-final{background:var(--surface-3); color:#fff; border-radius:8px; padding:11px 14px; font-weight:600; font-size:13.5px; margin-top:8px; font-family:'IBM Plex Mono',monospace;}
+
+/* ============ ILLUSTRATIONS (shared) ============ */
+.illus-block{max-width:720px; margin:20px 0 26px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px 22px;}
+.illus-title{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--text-dim); margin-bottom:14px; font-weight:600;}
+
+/* value-card / ratio-card grid */
+.ratio-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
+.ratio-card{background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px;}
+.ratio-card.hi{border-color:var(--gold); box-shadow:0 0 0 1px var(--gold);}
+.ratio-card .rname{font-weight:700; font-size:13.5px; color:var(--gold-soft); margin-bottom:4px;}
+.ratio-card .rformula{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--text-muted); margin-bottom:8px;}
+.ratio-card .ruse{font-size:12px; color:var(--text-dim); border-top:1px dashed var(--border); padding-top:8px; margin-top:8px;}
+
+/* waterfall */
+.waterfall{display:flex; flex-direction:column; gap:6px; max-width:520px; margin:14px auto;}
+.wf-step{display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-radius:8px; font-size:13px; font-family:'IBM Plex Mono',monospace;}
+.wf-step.base{background:var(--surface-3); color:#fff; font-weight:600;}
+.wf-step.plus{background:rgba(46,111,82,0.12); color:var(--green);}
+.wf-step.minus{background:rgba(164,63,38,0.1); color:var(--rust);}
+.wf-step.result{background:var(--gold); color:#fff; font-weight:700;}
+
+/* steps flow */
+.steps-flow{display:flex; align-items:stretch; gap:0; margin:16px 0; flex-wrap:wrap;}
+.step-node{flex:1; min-width:130px; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:12px 13px; text-align:center;}
+.step-node .sn-num{width:22px; height:22px; border-radius:50%; background:var(--gold); color:#fff; font-size:11.5px; font-weight:700; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; font-family:'IBM Plex Mono',monospace;}
+.step-node .sn-txt{font-size:12px; color:var(--text-muted); line-height:1.4;}
+.step-connector{display:flex; align-items:center; justify-content:center; width:28px; color:var(--gold); font-size:16px; flex-shrink:0;}
+@media (max-width:860px){
+  .steps-flow{flex-direction:column;}
+  .step-connector{width:auto; height:20px; transform:rotate(90deg);}
+}
+
+/* toggle explorer (2-state) */
+.toggle-row{display:flex; gap:8px; justify-content:center; margin-bottom:14px;}
+.toggle-btn{font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; padding:7px 16px; border-radius:20px; border:1px solid var(--border); background:var(--bg); color:var(--text-muted); cursor:pointer;}
+.toggle-btn.active{background:var(--gold); color:#fff; border-color:var(--gold);}
+
+/* comparison columns */
+.compare-cols{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+.compare-col{background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px;}
+.compare-col h5{margin:0 0 8px; font-size:13px; color:var(--gold-soft);}
+.compare-col ul{margin:0; padding-left:18px; font-size:12.5px;}
+.compare-col li{margin-bottom:6px;}
+
+/* criteria list */
+.criteria-list{display:flex; flex-direction:column; gap:10px; margin:14px 0;}
+.criteria-item{display:flex; gap:12px; align-items:flex-start;}
+.cnum{width:24px; height:24px; border-radius:50%; background:var(--gold); color:#fff; font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;}
+.criteria-item .ctxt{font-size:13.5px;}
+.criteria-item .ctxt b{display:block; margin-bottom:2px;}
+
+/* gauge / scale */
+.scale-track{position:relative; height:10px; background:linear-gradient(90deg, var(--green-soft), var(--surface-2) 50%, var(--rust-soft)); border-radius:6px; margin:22px 0 8px;}
+.scale-marker{position:absolute; top:-9px; width:3px; height:28px; background:var(--text); border-radius:2px;}
+.scale-labels{display:flex; justify-content:space-between; font-size:11px; color:var(--text-dim);}
+
+/* bars (mean comparison, quality bars etc) */
+.bar-chart{display:flex; align-items:flex-end; gap:16px; height:170px; margin:18px 0 6px; padding:0 6px;}
+.bar-col{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%;}
+.bar-col .bv{font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; color:var(--text-muted); margin-bottom:6px;}
+.bar-col .bar{width:60%; background:var(--gold); border-radius:5px 5px 0 0;}
+.bar-col .bl{font-size:11px; color:var(--text-dim); margin-top:7px; text-align:center;}
+
+/* app-grid style feature cards */
+.app-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:16px 0;}
+.app-card{background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:13px 15px;}
+.app-card .aic{font-size:18px; margin-bottom:6px;}
+.app-card .at{font-weight:600; font-size:13px; margin-bottom:3px;}
+.app-card .ad{font-size:12px; color:var(--text-dim); line-height:1.45;}
+
+@media (max-width:860px){
+  #app{flex-direction:column; max-width:100%;}
+  .sidebar{width:100%; height:auto; position:relative; top:auto;}
+  .main{padding:20px 16px 70px;}
+  .ratio-grid{grid-template-columns:1fr;}
+  .compare-cols{grid-template-columns:1fr;}
+  .app-grid{grid-template-columns:1fr;}
+  .stat-grid{grid-template-columns:repeat(2,1fr);}
+  .flashcard{height:260px;}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 24L11 8L15 17L19 6L26 24" stroke="#A38228" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+          <circle cx="11" cy="8" r="1.6" fill="#A38228"/>
+          <circle cx="19" cy="6" r="1.6" fill="#A38228"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-eyebrow">CFA LEVEL II · EQUITY</div>
+        <div class="brand-title">R20 — Market-Based Valuation: Price &amp; EV Multiples</div>
+      </div>
+    </div>
+    <div class="sidebar-stats">
+      <div class="stat-chip"><div class="v" id="mastery-pct">0%</div><div class="l">Mastered</div></div>
+      <div class="stat-chip"><div class="v" id="due-count">0</div><div class="l">Due for review</div></div>
+    </div>
+    <div class="sync-line"><span class="sync-dot" id="sync-dot"></span><span id="sync-status">Connecting…</span></div>
+
+    <div class="nav-group-label">Start here</div>
+    <button class="nav-item" data-view="overview">🗺️ Overview &amp; roadmap</button>
+
+    <div class="nav-group-label">Module 20.1 — P/E Multiple</div>
+    <button class="nav-item" data-view="a"><span class="mastery-dot" data-sec="a"></span>LOS 20.a — Comparables vs. fundamentals<span class="code">a</span></button>
+    <button class="nav-item" data-view="b"><span class="mastery-dot" data-sec="b"></span>LOS 20.b — Justified price multiple<span class="code">b</span></button>
+
+    <div class="nav-group-label">Rationales &amp; formulas (all ratios)</div>
+    <button class="nav-item" data-view="c"><span class="mastery-dot" data-sec="c"></span>LOS 20.c — Rationales &amp; drawbacks<span class="code">c</span></button>
+    <button class="nav-item" data-view="d"><span class="mastery-dot" data-sec="d"></span>LOS 20.d — Calculating the ratios<span class="code">d</span></button>
+
+    <div class="nav-group-label">Module 20.4 — Earnings quality</div>
+    <button class="nav-item" data-view="e"><span class="mastery-dot" data-sec="e"></span>LOS 20.e — Underlying &amp; normalized EPS<span class="code">e</span></button>
+    <button class="nav-item" data-view="f"><span class="mastery-dot" data-sec="f"></span>LOS 20.f — Earnings yield (E/P)<span class="code">f</span></button>
+
+    <div class="nav-group-label">Justified multiples</div>
+    <button class="nav-item" data-view="g"><span class="mastery-dot" data-sec="g"></span>LOS 20.g — Fundamental drivers<span class="code">g</span></button>
+    <button class="nav-item" data-view="h"><span class="mastery-dot" data-sec="h"></span>LOS 20.h — Predicted P/E (regression)<span class="code">h</span></button>
+    <button class="nav-item" data-view="i"><span class="mastery-dot" data-sec="i"></span>LOS 20.i — Justified P/E, P/B, P/S<span class="code">i</span></button>
+    <button class="nav-item" data-view="j"><span class="mastery-dot" data-sec="j"></span>LOS 20.j — PEG ratio<span class="code">j</span></button>
+    <button class="nav-item" data-view="k"><span class="mastery-dot" data-sec="k"></span>LOS 20.k — Multiples for terminal value<span class="code">k</span></button>
+
+    <div class="nav-group-label">Method of comparables</div>
+    <button class="nav-item" data-view="l"><span class="mastery-dot" data-sec="l"></span>LOS 20.l — Over/under/fairly valued<span class="code">l</span></button>
+    <button class="nav-item" data-view="m"><span class="mastery-dot" data-sec="m"></span>LOS 20.m — Role of fundamentals<span class="code">m</span></button>
+
+    <div class="nav-group-label">EV multiples &amp; global issues</div>
+    <button class="nav-item" data-view="n"><span class="mastery-dot" data-sec="n"></span>LOS 20.n — Cash flow definitions<span class="code">n</span></button>
+    <button class="nav-item" data-view="o"><span class="mastery-dot" data-sec="o"></span>LOS 20.o — EV multiples &amp; EV/EBITDA<span class="code">o</span></button>
+    <button class="nav-item" data-view="p"><span class="mastery-dot" data-sec="p"></span>LOS 20.p — Cross-border comparisons<span class="code">p</span></button>
+    <button class="nav-item" data-view="q"><span class="mastery-dot" data-sec="q"></span>LOS 20.q — Momentum indicators<span class="code">q</span></button>
+    <button class="nav-item" data-view="r"><span class="mastery-dot" data-sec="r"></span>LOS 20.r — Mean of a group of multiples<span class="code">r</span></button>
+
+    <div class="nav-group-label">Practice</div>
+    <button class="nav-item" data-view="review">🔁 Spaced Review</button>
+    <button class="nav-item" data-view="quiz">📝 Module Quiz</button>
+    <button class="nav-item" data-view="practice">🧮 Practice Problems</button>
+  </aside>
+
+  <main class="main">
+    <!-- VIEWS WILL BE INSERTED HERE -->
+    <div class="view active" id="view-overview">
+      <span class="los-tag">READING 20</span>
+      <h1 class="section-title">Market-Based Valuation: Price and Enterprise Value Multiples</h1>
+      <p class="section-sub">18 Learning Outcome Statements across 4 modules. This reading builds directly on the Gordon growth model (Reading 18) and FCFE/FCFF models (Reading 19) — every "justified multiple" formula here is just that same DCF value, algebraically rearranged into a ratio.</p>
+
+      <div class="theory">
+        <p><strong>Exam focus.</strong> This topic review covers the estimation of P/E, P/B, PEG, P/S, P/CF, and enterprise value/EBITDA ratios. The justified price multiple models draw heavily on the discounted dividend and free cash flow readings. You should be able to (1) estimate a justified price multiple for an individual firm from its fundamentals, and (2) apply the method of comparables to estimate a stock's relative value against a benchmark.</p>
+
+        <div class="callout">
+          <span class="callout-label">Two competing philosophies — hold this frame the whole reading</span>
+          <p><strong>Method of comparables:</strong> value a stock by comparing its multiple to a benchmark (peer, industry, index). Rooted in the <strong>Law of One Price</strong> — similar assets should sell at similar multiples. Purely <em>relative</em>: you can only say "over/undervalued relative to X," never "worth $Y."</p>
+          <p><strong>Method based on forecasted fundamentals:</strong> value a stock by computing what its multiple <em>should</em> be, using a DCF model (usually Gordon growth) rearranged algebraically. This gives an absolute "justified" multiple, rooted in DCF theory.</p>
+        </div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card"><div class="v">18</div><div class="l">LOS total</div></div>
+        <div class="stat-card"><div class="v">5</div><div class="l">Price multiples covered</div></div>
+        <div class="stat-card"><div class="v">4</div><div class="l">Modules</div></div>
+        <div class="stat-card"><div class="v" id="ov-cardcount">—</div><div class="l">Flashcards</div></div>
+      </div>
+
+      <h4 style="font-family:'Roboto Slab',serif; font-size:16px; color:var(--text); margin:26px 0 10px;">Roadmap — click any LOS to jump in</h4>
+      <div class="roadmap" id="overview-roadmap"><!-- populated by JS --></div>
+    </div>
+
+    <!-- ============ LOS 20.a ============ -->
+    <div class="view" id="view-a">
+      <span class="los-tag">LOS 20.a</span><span class="module-tag">MODULE 20.1 · P/E MULTIPLE</span>
+      <h1 class="section-title">Method of Comparables vs. Method of Forecasted Fundamentals</h1>
+      <p class="section-sub">Contrast the two approaches to using price multiples in valuation and explain the economic rationale behind each.</p>
+      <div class="theory">
+        <h4>Warm-up: what is a "multiple"?</h4>
+        <p>Price multiples are ratios of a stock's market price to some fundamental variable (earnings, book value, sales, cash flow). They are among the most widely used tools for valuing equities because they let an investor quickly judge whether a stock looks overvalued, undervalued, or properly valued relative to a benchmark. <strong>Enterprise value multiples</strong> relate the total value of a company — the market value of its capital from all sources — to a measure of operating earnings such as EBITDA. <strong>Momentum indicators</strong> compare a stock's price, or a company's earnings, to their own values in earlier periods.</p>
+
+        <div class="illus-block">
+          <div class="illus-title">Two philosophies, side by side</div>
+          <div class="compare-cols">
+            <div class="compare-col">
+              <h5>Method of Comparables</h5>
+              <ul>
+                <li>Values a stock using the <strong>average price multiple</strong> of similar companies (a peer, an industry, an index, or the stock's own history).</li>
+                <li>Economic rationale: the <strong>Law of One Price</strong> — two similar assets should sell at comparable price multiples.</li>
+                <li><strong>Relative</strong> valuation method — you can only say the stock is over/undervalued <em>relative to the benchmark</em>, never state an absolute intrinsic value.</li>
+              </ul>
+            </div>
+            <div class="compare-col">
+              <h5>Method of Forecasted Fundamentals</h5>
+              <ul>
+                <li>Values a stock using the ratio of its <strong>DCF-model value</strong> to a fundamental variable (e.g., EPS).</li>
+                <li>Economic rationale: value = present value of expected future cash flows discounted at the risk-adjusted required return — exactly the logic behind every DCF model you already know.</li>
+                <li>Produces a <strong>justified ("fair value") multiple</strong> — an absolute benchmark derived from theory, not from the market.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <p class="nudge"><span class="ic">💡</span><span class="nudge-text"> The two methods are not rivals you must pick between on the exam — they are two different <em>lenses</em>. The method of comparables asks "is this cheap relative to its peers?" The method of forecasted fundamentals asks "is this cheap relative to what a DCF model says it should be worth?" A stock can be cheap by one lens and expensive by the other.</span></p>
+
+        <h4>Worked example — Method of Comparables</h4>
+        <p>MK Technologies shares sell for $50. Trailing EPS is $2. The average trailing P/E for MK's industry peers is 32×.</p>
+        <div class="formula-box">
+          <div class="label">Solution</div>
+          <div class="eq">MK's trailing P/E = 50 / 2 = <strong>25×</strong></div>
+          <div class="fdef"><div>MK is <b>relatively undervalued</b> — its trailing P/E (25×) is below the industry average (32×). Note the word "relatively": this says nothing about MK's absolute intrinsic value, only about its price relative to peers.</div></div>
+        </div>
+
+        <h4>Worked example — Method of Forecasted Fundamentals</h4>
+        <p>Comtronics shares sell for $30. Mean forecast EPS for next year is $4.00, long-run growth is 5%, the payout ratio is 60%, and the required return is 14%. Find the fundamental value using the Gordon growth model, then judge over/undervaluation.</p>
+        <div class="formula-box">
+          <div class="label">Solution</div>
+          <div class="eq">V₀ = D₁ / (r − g) = (0.60 × 4) / (0.14 − 0.05) = 2.40 / 0.09 = <strong>$26.67</strong></div>
+          <div class="fdef">
+            <div>Fair-value (justified) leading P/E = 26.67 / 4.00 = <b>6.67×</b></div>
+            <div>Observed leading P/E = 30 / 4.00 = <b>7.5×</b></div>
+            <div>Comtronics is <b>overvalued</b>: the observed multiple (7.5×) exceeds the justified multiple (6.67×). Equivalently: market price ($30.00) &gt; intrinsic value ($26.67) — same conclusion, two routes.</div>
+          </div>
+        </div>
+        <p class="nudge"><span class="ic">✅</span><span class="nudge-text"> Active recall: before reading on, explain out loud why the Comtronics example is "forecasted fundamentals" and the MK example is "comparables" — without looking back at the definitions.</span></p>
+      </div>
+
+      <div class="deck-block">
+        <h3>Active recall — LOS 20.a flashcards</h3>
+        <div class="deck-holder" id="deck-holder-a"></div>
+      </div>
+    </div>
+
+    <!-- ============ LOS 20.b ============ -->
+    <div class="view" id="view-b">
+      <span class="los-tag">LOS 20.b</span><span class="module-tag">MODULE 20.1 · P/E MULTIPLE</span>
+      <h1 class="section-title">Calculate and Interpret a Justified Price Multiple</h1>
+      <p class="section-sub">The core interpretive rule that governs every multiple in this reading.</p>
+      <div class="theory">
+        <p>A <strong>justified price multiple</strong> is what the multiple <em>should be</em> if the stock is fairly valued — derived either from the method of comparables (the benchmark's multiple) or the method of forecasted fundamentals (a DCF-based ratio, e.g., the constant-growth P/E = payout ratio / (r − g)).</p>
+
+        <div class="formula-box">
+          <div class="label">The single rule that runs through the whole reading</div>
+          <div class="eq">Actual multiple &gt; Justified multiple → stock is <span style="color:#D9855F">OVERVALUED</span></div>
+          <div class="eq">Actual multiple &lt; Justified multiple → stock is <span style="color:#8AB6A5">UNDERVALUED</span></div>
+          <div class="fdef"><div>(all else, i.e. risk and growth, assumed equal between the stock and its justified benchmark)</div></div>
+        </div>
+
+        <p>A price multiple can be "justified" two different ways, mirroring LOS 20.a:</p>
+        <ul>
+          <li><strong>By the method of comparables:</strong> the justified multiple is simply the benchmark's current multiple (a peer's P/E, an industry median P/E, etc.).</li>
+          <li><strong>By the method of forecasted fundamentals:</strong> the justified multiple is calculated from a valuation model — most commonly the Gordon growth model, e.g. justified P/E = payout ratio / (r − g).</li>
+        </ul>
+        <p>Stocks with actual multiples below their justified multiple (by either method) are judged undervalued; stocks with actual multiples above their justified multiple are judged overvalued.</p>
+
+        <p class="nudge"><span class="ic">💡</span><span class="nudge-text"> "Justified" is not a synonym for "correct" — it is a benchmark. The entire rest of this reading is really about two questions: (1) how do I calculate a justified multiple for each of the five ratios (P/E, P/B, P/S, P/CF, EV/EBITDA)? and (2) how do I pick a sensible comparables benchmark? Keep coming back to this LOS as the organizing spine.</span></p>
+      </div>
+
+      <div class="deck-block">
+        <h3>Active recall — LOS 20.b flashcards</h3>
+        <div class="deck-holder" id="deck-holder-b"></div>
+      </div>
+    </div>
+
+    <!-- ============ LOS 20.c ============ -->
+    <div class="view" id="view-c">
+      <span class="los-tag">LOS 20.c</span><span class="module-tag">MODULES 20.1–20.4</span>
+      <h1 class="section-title">Rationales and Drawbacks of the Five Price Multiples + Dividend Yield</h1>
+      <p class="section-sub">Describe rationales for and possible drawbacks to using alternative price multiples and dividend yield in valuation. This LOS is tested qualitatively across all 5 ratios — memorize the pattern, not just the words.</p>
+      <div class="theory">
+        <p class="nudge"><span class="ic">💡</span><span class="nudge-text"> Pattern to notice: every ratio's "rationale" column praises what the denominator captures; every "drawback" column complains about how easily that same denominator can be distorted, negative, or non-comparable. Learn the pattern once and each ratio becomes easy to reconstruct.</span></p>
+
+        <h4>P/E Ratio</h4>
+        <div class="illus-block">
+          <div class="illus-title">Rationale vs. drawbacks</div>
+          <div class="compare-cols">
+            <div class="compare-col">
+              <h5>✅ Rationale</h5>
+              <ul>
+                <li>Earnings power (EPS) is the primary <strong>determinant of investment value</strong>.</li>
+                <li>The P/E ratio is extremely <strong>popular</strong> in the investment community — easy to communicate.</li>
+              </ul>
+            </div>
+            <div class="compare-col">
+              <h5>⚠️ Drawbacks</h5>
+              <ul>
+                <li>Earnings can be <strong>negative</strong> → meaningless P/E ratio.</li>
+                <li>The volatile, <strong>transitory portion</strong> of earnings makes P/E interpretation difficult.</li>
+                <li>Management <strong>discretion</strong> within allowed accounting practices can distort reported earnings.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <h4>P/B Ratio</h4>
+        <div class="illus-block">
+          <div class="illus-title">Rationale vs. drawbacks</div>
+          <div class="compare-cols">
+            <div class="compare-col">
+              <h5>✅ Rationale</h5>
+              <ul>
+                <li>Book value is cumulative and usually <strong>positive even when EPS is negative</strong>.</li>
+                <li>Book value is <strong>more stable</strong> than EPS — useful when EPS is unusually high, low, or volatile.</li>
+                <li>Appropriate net-asset-value measure for firms holding mostly <strong>liquid assets</strong>: finance, investment, insurance, and banking firms.</li>
+                <li>Useful for valuing companies expected to <strong>go out of business</strong> (liquidation-relevant).</li>
+              </ul>
+            </div>
+            <div class="compare-col">
+              <h5>⚠️ Drawbacks</h5>
+              <ul>
+                <li>Does not reflect the value of <strong>intangible economic assets</strong> such as human capital.</li>
+                <li>In some cases the firm's <strong>business model dictates the size of its asset base</strong> — misleading comparisons across business models.</li>
+                <li><strong>Different accounting conventions</strong> across firms/countries reduce comparability.</li>
+                <li><strong>Inflation and technological change</strong> can cause book and market values of assets to diverge significantly.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <h4>P/S Ratio</h4>
+        <div class="illus-block">
+          <div class="illus-title">Rationale vs. drawbacks</div>
+          <div class="compare-cols">
+            <div class="compare-col">
+              <h5>✅ Rationale</h5>
+              <ul>
+                <li><strong>Meaningful even for distressed firms</strong> — sales revenue is almost always positive.</li>
+                <li><strong>Not as easy to manipulate or distort</strong> as EPS and book value.</li>
+                <li><strong>Not as volatile</strong> as P/E multiples.</li>
+                <li>Particularly appropriate for valuing stocks in <strong>mature or cyclical industries</strong> and <strong>start-ups with no earnings record</strong>.</li>
+              </ul>
+            </div>
+            <div class="compare-col">
+              <h5>⚠️ Drawbacks</h5>
+              <ul>
+                <li><strong>High sales growth does not necessarily mean high operating profit</strong> as measured by earnings and cash flow.</li>
+                <li>P/S ratios <strong>do not capture differences in cost structures</strong> across companies.</li>
+                <li><strong>Revenue recognition practices</strong> can still distort sales forecasts.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <h4>P/CF Ratio</h4>
+        <div class="illus-block">
+          <div class="illus-title">Rationale vs. drawbacks</div>
+          <div class="compare-cols">
+            <div class="compare-col">
+              <h5>✅ Rationale</h5>
+              <ul>
+                <li>Cash flow is <strong>harder for managers to manipulate</strong> than earnings.</li>
+                <li><strong>More stable</strong> than price-to-earnings.</li>
+                <li>Handles the problem of differences in the <strong>quality of reported earnings</strong>.</li>
+                <li>Empirical evidence: differences in P/CF are <strong>significantly related to long-run average stock returns</strong>.</li>
+              </ul>
+            </div>
+            <div class="compare-col">
+              <h5>⚠️ Drawbacks (relate to the definition of cash flow used)</h5>
+              <ul>
+                <li><strong>EPS-plus-noncash-charges</strong> ignores noncash revenue and net changes in working capital.</li>
+                <li><strong>FCFE is theoretically preferable</strong> to CFO, but FCFE is <strong>more volatile</strong> than straight cash flow.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <h4>Dividend Yield (D/P)</h4>
+        <p>The dividend yield is the ratio of the common dividend to the market price. It is most often used for <strong>valuing indexes</strong>.</p>
+        <div class="illus-block">
+          <div class="illus-title">Rationale vs. drawbacks</div>
+          <div class="compare-cols">
+            <div class="compare-col">
+              <h5>✅ Rationale</h5>
+              <ul>
+                <li>Dividend yield <strong>contributes to total investment return</strong>.</li>
+                <li>Dividends are <strong>not as risky</strong> as the capital appreciation component of total return.</li>
+              </ul>
+            </div>
+            <div class="compare-col">
+              <h5>⚠️ Drawbacks</h5>
+              <ul>
+                <li><strong>Ignores capital appreciation</strong> entirely — only part of total return.</li>
+                <li>Implies a <strong>trade-off between current and future cash flows</strong> (high payout today can mean lower growth, hence lower future dividends).</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="deck-block">
+        <h3>Active recall — LOS 20.c flashcards</h3>
+        <div class="deck-holder" id="deck-holder-c"></div>
+      </div>
+    </div>
+
+    <!-- ============ LOS 20.d ============ -->
+    <div class="view" id="view-d">
+      <span class="los-tag">LOS 20.d</span><span class="module-tag">MODULES 20.1–20.4</span>
+      <h1 class="section-title">Calculating the Five Price Multiples and Dividend Yield</h1>
+      <p class="section-sub">Calculate and interpret alternative price multiples and dividend yield — trailing and leading variants, and the mechanics behind each ratio.</p>
+      <div class="theory">
+        <h4>P/E Ratio — trailing vs. leading</h4>
+        <div class="formula-box">
+          <div class="label">Trailing P/E</div>
+          <div class="eq">trailing P/E = market price per share / EPS over previous 12 months</div>
+          <div class="label" style="margin-top:14px;">Leading (forward) P/E</div>
+          <div class="eq">leading P/E = market price per share / forecasted EPS over next 12 months</div>
+        </div>
+        <ul>
+          <li><strong>Trailing P/E</strong> is not useful for forecasting/valuation if the firm's business has changed materially (e.g., after a merger, divestiture, or strategy shift).</li>
+          <li><strong>Leading P/E</strong> may not be relevant if earnings are sufficiently volatile that next year's EPS cannot be forecast with any accuracy.</li>
+        </ul>
+        <div class="callout"><span class="callout-label">Worked example — Byron Investments</span><p>An analyst gathers: current price €18.00, current-year net income €32,000,000, shares outstanding 40,000,000, forecasted net income next year €44,000,000 (same share count → forecasted EPS €1.00). Find trailing and leading P/E.</p></div>
+        <div class="formula-box">
+          <div class="eq">current-year EPS = €32,000,000 / 40,000,000 = €0.80</div>
+          <div class="eq">trailing P/E = €18.00 / €0.80 = <strong>22.5×</strong></div>
+          <div class="eq">leading P/E = €18.00 / €1.00 = <strong>18.0×</strong></div>
+        </div>
+
+        <h4>P/B Ratio</h4>
+        <div class="formula-box">
+          <div class="label">Book value of equity</div>
+          <div class="eq">book value of equity = common shareholders' equity = (total assets − total liabilities) − preferred stock</div>
+          <div class="label" style="margin-top:14px;">P/B ratio</div>
+          <div class="eq">P/B = market value of equity / book value of equity = market price per share / book value per share</div>
+        </div>
+        <p><strong>Adjustments to book value</strong> for more useful comparisons:</p>
+        <ul>
+          <li><strong>Tangible book value</strong> = book value of equity − intangible assets.</li>
+          <li>Adjust for significant <strong>off-balance-sheet assets and liabilities</strong>.</li>
+          <li>Adjust items to <strong>ensure comparability</strong> across firms (different accounting policies).</li>
+        </ul>
+        <div class="callout"><span class="callout-label">Worked example — Crisco Systems vs. Soothsayer Corp.</span><p>Crisco: book value of equity $28,039M, 7,001M shares, price $17.83. Soothsayer: book value of equity $6,320M, 5,233M shares, price $12.15.</p></div>
+        <div class="formula-box">
+          <div class="label">Crisco</div>
+          <div class="eq">BVPS = $28,039 / 7,001 = $4.01 &nbsp;&nbsp;→&nbsp;&nbsp; P/B = $17.83 / $4.01 = <strong>4.45×</strong></div>
+          <div class="label" style="margin-top:14px;">Soothsayer</div>
+          <div class="eq">BVPS = $6,320 / 5,233 = $1.21 &nbsp;&nbsp;→&nbsp;&nbsp; P/B = $12.15 / $1.21 = <strong>10.04×</strong></div>
+        </div>
+
+        <h4>P/S Ratio</h4>
+        <div class="formula-box">
+          <div class="eq">P/S = market value of equity / total sales = market price per share / sales per share</div>
+        </div>
+        <div class="callout"><span class="callout-label">Worked example — same Crisco / Soothsayer data, plus 20X3 sales</span><p>Crisco sales $18,878M; Soothsayer sales $9,475M (share counts as above).</p></div>
+        <div class="formula-box">
+          <div class="label">Crisco</div>
+          <div class="eq">sales/share = $18,878M / 7,001M = $2.70 &nbsp;&nbsp;→&nbsp;&nbsp; P/S = $17.83 / $2.70 = <strong>6.60×</strong></div>
+          <div class="label" style="margin-top:14px;">Soothsayer</div>
+          <div class="eq">sales/share = $9,475M / 5,233M = $1.81 &nbsp;&nbsp;→&nbsp;&nbsp; P/S = $12.15 / $1.81 = <strong>6.71×</strong></div>
+        </div>
+
+        <h4>P/CF Ratio</h4>
+        <div class="formula-box">
+          <div class="eq">P/CF = market value of equity / cash flow = market price per share / cash flow per share</div>
+          <div class="fdef"><div>where cash flow can be defined as: <b>CF</b> (earnings + noncash charges), <b>adjusted CFO</b>, <b>FCFE</b>, or <b>EBITDA</b> — see LOS 20.n for the full comparison of these four definitions.</div></div>
+        </div>
+
+        <h4>Dividend Yield (D/P) — trailing vs. leading</h4>
+        <div class="formula-box">
+          <div class="eq">trailing D/P = (4 × most recent quarterly dividend) / market price per share</div>
+          <div class="eq" style="margin-top:10px;">leading D/P = (forecasted dividends over next four quarters) / market price per share</div>
+        </div>
+        <div class="callout"><span class="callout-label">Worked example — OnePrice Inc.</span><p>Price $47.50. Most recent quarterly dividend $0.50. Next four quarters forecast to be $0.50, $0.55, $0.60, $0.65.</p></div>
+        <div class="formula-box">
+          <div class="eq">trailing D/P = (4 × $0.50) / $47.50 = $2.00/$47.50 = <strong>4.2%</strong></div>
+          <div class="eq">leading D/P = ($0.50+$0.55+$0.60+$0.65) / $47.50 = $2.30/$47.50 = <strong>4.8%</strong></div>
+        </div>
+        <p class="nudge"><span class="ic">✅</span><span class="nudge-text"> Notice the mechanical symmetry: every "trailing" version uses last period's actual number; every "leading" version uses next period's forecast. This single idea — trailing vs. leading — repeats for P/E and D/P, and the same logic underlies "justified trailing" vs. "justified leading" P/E in LOS 20.i.</span></p>
+      </div>
+
+      <div class="deck-block">
+        <h3>Active recall — LOS 20.d flashcards</h3>
+        <div class="deck-holder" id="deck-holder-d"></div>
+      </div>
+    </div>
+
+    <!-- ============ LOS 20.e ============ -->
+    <div class="view" id="view-e">
+      <span class="los-tag">LOS 20.e</span><span class="module-tag">MODULE 20.4</span>
+      <h1 class="section-title">Underlying Earnings and Normalized EPS</h1>
+      <p class="section-sub">Calculate and interpret underlying earnings, explain methods of normalizing EPS, and calculate normalized EPS.</p>
+      <div class="theory">
+        <h4>Underlying earnings</h4>
+        <p><strong>Underlying earnings</strong> (also called persistent, continuing, or core earnings) exclude <strong>nonrecurring components</strong> — gains and losses from asset sales, asset write-downs, provisions for future losses, and changes in accounting estimates. Use <strong>diluted EPS</strong> as the starting point.</p>
+        <div class="callout"><span class="callout-label">Rule of thumb</span><p>Nonrecurring <em>gains</em> inflated reported earnings → <strong>subtract</strong> them out. Nonrecurring <em>losses/expenses</em> depressed reported earnings → <strong>add</strong> them back. You are always solving for what earnings "really" were, absent the one-off noise.</p></div>
+
+        <div class="callout"><span class="callout-label">Worked example — Magnolia Enterprises (underlying earnings)</span>
+        <p>Trailing four quarters' reported diluted EPS: Dec 2021 C$1.45, Mar 2022 C$1.30, Jun 2022 C$1.40, Sep 2022 C$1.35 (stock price at Sep 2022 = C$44.85). During the year: Mar 2022 had a C$0.30/share gain on asset sales; Jun 2022 had a C$0.55/share extraordinary expense.</p></div>
+        <div class="formula-box">
+          <div class="eq">12-month reported EPS = 1.45 + 1.30 + 1.40 + 1.35 = C$5.50</div>
+          <div class="eq">underlying earnings = 5.50 − 0.30 (remove gain) + 0.55 (add back expense) = <strong>C$5.75</strong></div>
+          <div class="eq">trailing P/E (on underlying earnings) = C$44.85 / C$5.75 = <strong>7.80×</strong></div>
+        </div>
+
+        <h4>Normalized earnings</h4>
+        <p><strong>Normalized earnings</strong> are an estimate of EPS at the <strong>middle of the business cycle</strong> — what the company would earn under mid-cycle, "normal" conditions. Two methods:</p>
+        <div class="ratio-grid">
+          <div class="ratio-card">
+            <div class="rname">Method of historical average EPS</div>
+            <div class="rformula">average EPS over the most recent full business cycle</div>
+            <div class="ruse">Simple, but does not adjust for changes in firm size over the cycle.</div>
+          </div>
+          <div class="ratio-card hi">
+            <div class="rname">Method of average ROE</div>
+            <div class="rformula">normalized EPS = average ROE × current BVPS</div>
+            <div class="ruse">Preferred — reliance on current BVPS reflects the effect of firm-size changes more accurately than the historical-average-EPS method.</div>
+          </div>
+        </div>
+
+        <div class="callout"><span class="callout-label">Worked example — Magnolia Enterprises (normalized earnings)</span>
+        <div class="table-scroll"><table class="mini"><tr><th>Year</th><th>20X1</th><th>20X2</th><th>20X3</th><th>20X4</th></tr>
+        <tr><td>EPS</td><td>C$4.20</td><td>C$3.75</td><td>C$4.75</td><td>C$4.30</td></tr>
+        <tr><td>BVPS</td><td>C$26.02</td><td>C$27.78</td><td>C$29.25</td><td>C$32.29</td></tr>
+        <tr><td>ROE</td><td>14.0%</td><td>12.0%</td><td>16.0%</td><td>14.0%</td></tr></table></div></div>
+        <div class="formula-box">
+          <div class="eq">historical-average-EPS method = (4.20+3.75+4.75+4.30)/4 = <strong>C$4.25</strong></div>
+          <div class="eq" style="margin-top:10px;">average ROE = (0.14+0.12+0.16+0.14)/4 = 14.00%</div>
+          <div class="eq">average-ROE method = 0.14 × C$32.29 (current BVPS) = <strong>C$4.52</strong></div>
+        </div>
+
+        <div class="callout">
+          <span class="callout-label">The Molodovsky effect</span>
+          <p>The <strong>countercyclical tendency</strong> to see <em>high</em> P/Es at the <em>bottom</em> of the earnings cycle (because EPS is temporarily depressed) and <em>low</em> P/Es at the <em>top</em> of the cycle (because EPS is temporarily inflated). This is exactly why normalized/underlying earnings are preferred to raw trailing EPS for cyclical companies — raw P/E gets systematically distorted by where the company sits in its cycle.</p>
+        </div>
+      </div>
+
+      <div class="deck-block">
+        <h3>Active recall — LOS 20.e flashcards</h3>
+        <div class="deck-holder" id="deck-holder-e"></div>
+      </div>
+    </div>
+
+    <!-- ============ LOS 20.f ============ -->
+    <div class="view" id="view-f">
+      <span class="los-tag">LOS 20.f</span><span class="module-tag">MODULE 20.4</span>
+      <h1 class="section-title">Earnings Yield (E/P)</h1>
+      <p class="section-sub">Explain and justify the use of earnings yield.</p>
+      <div class="theory">
+        <p>The <strong>earnings yield</strong> is simply the reciprocal of the P/E ratio: E/P instead of P/E.</p>
+        <div class="formula-box"><div class="eq">E/P = EPS / market price per share</div></div>
+        <p>Its key advantage over P/E: <strong>price is never negative</strong>, so E/P is always meaningful — even for firms with negative earnings (where P/E would be meaningless or misleading).</p>
+        <ul>
+          <li>A <strong>high E/P</strong> suggests a <strong>cheap</strong> security.</li>
+          <li>A <strong>low E/P</strong> suggests an <strong>expensive</strong> security.</li>
+        </ul>
+        <p>Securities can therefore be ranked from cheap to expensive based on E/P ratios — including firms with losses, where a negative E/P still ranks sensibly (a very negative E/P is clearly worse than a small positive one), unlike a negative P/E which just produces a nonsensical negative multiple.</p>
+        <p class="nudge"><span class="ic">💡</span><span class="nudge-text"> E/P also appears later in the <strong>Fed model</strong> (LOS 20.g/h territory): comparing the market's earnings yield to the 10-year Treasury yield to judge broad-market over/undervaluation.</span></p>
+      </div>
+
+      <div class="deck-block">
+        <h3>Active recall — LOS 20.f flashcards</h3>
+        <div class="deck-holder" id="deck-holder-f"></div>
+      </div>
+    </div>
+
+    <!-- ============ LOS 20.g ============ -->
+    <div class="view" id="view-g">
+      <span class="los-tag">LOS 20.g</span><span class="module-tag">MODULE 20.4</span>
+      <h1 class="section-title">Fundamental Factors That Influence the Multiples</h1>
+      <p class="section-sub">Describe fundamental factors that influence alternative price multiples and dividend yield — the directional relationships you must know cold.</p>
+      <div class="theory">
+        <p>Every "justified multiple" formula in LOS 20.i is a rearranged Gordon growth model. That means the same few inputs — <strong>growth (g)</strong>, <strong>required return (r)</strong>, <strong>payout ratio</strong>, and profitability (<strong>ROE</strong> or <strong>profit margin</strong>) — drive every multiple. Master these directional relationships and the formulas in LOS 20.i become intuitive rather than memorized.</p>
+
+        <table class="dtable">
+          <tr><th>Multiple</th><th>Increases when…</th><th>Decreases when…</th></tr>
+          <tr><td><strong>P/E</strong></td><td>growth (g) increases; risk/required return (r) decreases</td><td>risk/required return (r) increases; growth (g) decreases</td></tr>
+          <tr><td><strong>P/B</strong></td><td>ROE increases (wider ROE − r spread)</td><td>ROE decreases (narrower or negative ROE − r spread)</td></tr>
+          <tr><td><strong>P/S</strong></td><td>profit margin increases; earnings growth rate increases</td><td>profit margin decreases; growth decreases</td></tr>
+          <tr><td><strong>P/CF</strong></td><td>required return decreases; growth rate increases</td><td>required return increases; growth rate decreases</td></tr>
+          <tr><td><strong>EV/EBITDA</strong></td><td>growth in FCFF and EBITDA increases</td><td>firm's overall risk and WACC increase</td></tr>
+          <tr><td><strong>Dividend yield (D/P)</strong></td><td>required return (r) increases</td><td>forecasted growth rate in dividends increases</td></tr>
+        </table>
+
+        <div class="callout">
+          <span class="callout-label">P/B specifically — the ROE spread</span>
+          <p>Justified P/B = (ROE − g) / (r − g). P/B increases as ROE increases. The <strong>larger the spread between ROE and r</strong>, all else equal, the <strong>higher</strong> the P/B ratio — a firm earning well above its cost of equity deserves to trade at a large premium to book value.</p>
+        </div>
+
+        <div class="callout">
+          <span class="callout-label">P/S specifically — two channels for profit margin</span>
+          <p>Justified P/S = (E₀/S₀) × (1−b) × (1+g) / (r−g). Net profit margin (E₀/S₀) influences P/S <strong>directly</strong> (it's a factor in the numerator) <em>and</em> <strong>indirectly</strong> through its effect on the sustainable growth rate g (since g = retention ratio × ROE, and ROE embeds profit margin via DuPont).</p>
+        </div>
+
+        <p class="nudge"><span class="ic">✅</span><span class="nudge-text"> Quiz yourself: for each of the six rows above, can you explain <em>why</em> the relationship holds by tracing it back to the Gordon growth formula V₀ = D₁/(r−g)? If you can derive it, you don't need to memorize it.</span></p>
+      </div>
+
+      <div class="deck-block">
+        <h3>Active recall — LOS 20.g flashcards</h3>
+        <div class="deck-holder" id="deck-holder-g"></div>
+      </div>
+    </div>
+
+    <!-- ============ LOS 20.h ============ -->
+    <div class="view" id="view-h">
+      <span class="los-tag">LOS 20.h</span><span class="module-tag">MODULE 20.4</span>
+      <h1 class="section-title">Predicted P/E from a Cross-Sectional Regression</h1>
+      <p class="section-sub">Calculate and interpret a predicted P/E given a cross-sectional regression on fundamentals, and explain limitations of the methodology.</p>
+      <div class="theory">
+        <p>A <strong>cross-sectional regression</strong> is a regression in which the explained and explanatory variables are all measured at the <strong>same point in time</strong> (e.g., across many peer firms today). A <strong>predicted P/E</strong> is estimated from a linear regression of historical P/Es on fundamental variables — typically payout ratio, growth, and risk (beta).</p>
+
+        <div class="callout"><span class="callout-label">Worked example — public utility</span>
+        <p>An analyst is valuing a public utility with dividend payout ratio 0.50, beta 0.95, expected earnings growth 0.06. A regression on peer utilities gives:</p>
+        <p style="font-family:'IBM Plex Mono',monospace; font-size:13px; text-align:center;">predicted P/E = 6.75 + (4.00 × payout) + (12.35 × growth) − (0.5 × beta)</p>
+        <p>The firm's actual P/E is 12.0. Is it over- or underpriced?</p></div>
+        <div class="formula-box">
+          <div class="eq">predicted P/E = 6.75 + (4.00×0.50) + (12.35×0.06) − (0.5×0.95) = <strong>9.02</strong></div>
+          <div class="fdef"><div>Actual P/E (12.0) &gt; predicted P/E (9.02) → the firm is <b>overpriced</b>.</div></div>
+        </div>
+
+        <h4>Three limitations of the cross-sectional regression methodology</h4>
+        <ol>
+          <li>The predictive power of the regression for a <strong>different time period and/or sample</strong> of stocks is uncertain.</li>
+          <li>The relationships between P/E and the fundamental variables examined <strong>may change over time</strong>.</li>
+          <li><strong>Multicollinearity</strong> is often a problem in these regressions, making individual coefficients hard to interpret.</li>
+        </ol>
+        <div class="callout"><span class="callout-label">Professor's note</span><p>Multicollinearity refers to high correlation between two or more independent variables in a multiple regression — a concept from Quantitative Methods. Because payout, growth, and beta are often correlated with each other, isolating "the effect of growth alone" from the coefficient becomes unreliable even though the overall prediction may still be useful.</p></div>
+        <p class="nudge"><span class="ic">💡</span><span class="nudge-text"> Do not confuse this with LOS 20.i's "justified P/E" formula. The <em>predicted</em> P/E (this LOS) comes from an <strong>empirical regression</strong> fit to market data; the <em>justified</em> P/E (LOS 20.i) comes from a <strong>theoretical DCF model</strong> (Gordon growth). Both compare "actual vs. model" to judge mispricing, but the model itself is built completely differently.</span></p>
+      </div>
+
+      <div class="deck-block">
+        <h3>Active recall — LOS 20.h flashcards</h3>
+        <div class="deck-holder" id="deck-holder-h"></div>
+      </div>
+    </div>
+
+    <!-- ============ LOS 20.i ============ -->
+    <div class="view" id="view-i">
+      <span class="los-tag">LOS 20.i</span><span class="module-tag">MODULE 20.4</span>
+      <h1 class="section-title">Justified P/E, P/B, and P/S Based on Forecasted Fundamentals</h1>
+      <p class="section-sub">The heart of the reading — deriving each justified multiple algebraically from the Gordon growth model.</p>
+      <div class="theory">
+        <div class="callout"><span class="callout-label">Professor's note</span><p>The material is organized by ratio below. Once you know the justified-multiple formula for a ratio, you already know its fundamental drivers (LOS 20.g) — they're the same variables. Note that the LOS asks you to <em>describe</em> the fundamentals behind every multiple (including P/CF, EV/EBITDA, and dividend yield — covered in LOS 20.g), but to actually <em>calculate</em> only three: P/E, P/B, and P/S.</p></div>
+
+        <h4>Justified P/E — derived from the Gordon growth model</h4>
+        <div class="formula-box">
+          <div class="label">Starting point: Gordon growth model</div>
+          <div class="eq">V₀ = D₀×(1+g) / (r−g) = D₁ / (r−g)</div>
+          <div class="label" style="margin-top:14px;">Justified trailing P/E (divide both sides by E₀; D₀/E₀ = payout ratio = 1−b)</div>
+          <div class="eq">P₀/E₀ = [D₀×(1+g)/E₀] / (r−g) = <strong>(1−b)×(1+g) / (r−g)</strong></div>
+          <div class="label" style="margin-top:14px;">Justified leading P/E (divide both sides by E₁ instead)</div>
+          <div class="eq">P₀/E₁ = (D₁/E₁) / (r−g) = <strong>(1−b) / (r−g)</strong></div>
+        </div>
+        <div class="callout"><span class="callout-label">Professor's note — the (1+g) relationship</span><p>Since E₁ > E₀ when earnings grow, the justified <strong>leading</strong> P/E (P₀/E₁) will always be <em>smaller</em> than the justified <strong>trailing</strong> P/E (P₀/E₀) — you're dividing by a bigger number. In fact: <strong>justified trailing P/E = justified leading P/E × (1+g)</strong>. This identity is a fast cross-check on any P/E problem.</p></div>
+        <p>Fundamental drivers of justified P/E:</p>
+        <ul>
+          <li><strong>Positively related</strong> to the expected growth rate of cash flows (dividends or FCF), all else equal.</li>
+          <li><strong>Inversely related</strong> to the stock's required rate of return, all else equal.</li>
+          <li><strong>Positively related to the inflation pass-through rate</strong> (less obvious): of two similar firms in the same inflationary environment, the one better able to pass rising costs on to customers should carry the higher P/E.</li>
+        </ul>
+        <div class="callout"><span class="callout-label">Worked example — Comtronics (cross-check against LOS 20.a)</span><p>Price $30, next-year EPS forecast $4, g=5%, payout=60%, r=14%. Justified leading P/E?</p></div>
+        <div class="formula-box"><div class="eq">justified leading P/E = (1−0.60)/(0.14−0.05) = 0.40/0.09 = <strong>6.67×</strong></div><div class="fdef"><div>Identical to the "long way" answer from LOS 20.a ($26.67 fair value ÷ $4.00 = 6.67×) — same model, same answer, two routes to it.</div></div></div>
+        <div class="callout"><span class="callout-label">Worked example — generic</span><p>Payout ratio 40%, required return 11%, growth 5%. Find trailing and leading P/E.</p></div>
+        <div class="formula-box">
+          <div class="eq">justified trailing P/E = (1−0.40)×(1.05) / (0.11−0.05) = 0.60×1.05/0.06 = <strong>7.00×</strong></div>
+          <div class="eq">justified leading P/E = (1−0.40) / (0.11−0.05) = 0.60/0.06 = <strong>6.67×</strong></div>
+          <div class="fdef"><div>Cross-check: 6.67 × 1.05 = 7.00 ✓ (matches the trailing→leading identity above)</div></div>
+        </div>
+
+        <h4>Justified P/B — derived using g = ROE × b</h4>
+        <p>Using the sustainable growth relation <strong>g = ROE × b</strong> and E₁ = B₀ × ROE, the Gordon growth model can also be rearranged in terms of book value:</p>
+        <div class="formula-box"><div class="eq">justified P/B = P₀/B₀ = <strong>(ROE − g) / (r − g)</strong></div></div>
+        <div class="callout"><span class="callout-label">Worked example</span><p>ROE 14%, required return 8%, growth 4%.</p></div>
+        <div class="formula-box"><div class="eq">justified P/B = (0.14−0.04)/(0.08−0.04) = 0.10/0.04 = <strong>2.5×</strong></div></div>
+
+        <h4>Justified P/S — derived using net profit margin = E₀/S₀</h4>
+        <div class="formula-box">
+          <div class="label">Trailing sales basis</div>
+          <div class="eq">justified P₀/S₀ = (E₀/S₀) × (1−b) × (1+g) / (r−g)</div>
+          <div class="label" style="margin-top:14px;">Forecasted sales basis</div>
+          <div class="eq">justified P₀/S₁ = (E₁/S₁) × (1−b) / (r−g)</div>
+          <div class="label" style="margin-top:14px;">Useful shortcut</div>
+          <div class="eq">justified P/S = net profit margin × justified trailing P/E</div>
+        </div>
+        <div class="callout"><span class="callout-label">Worked example</span><p>Payout 40%, ROE 8.3%, EPS $4.25, sales per share $218.75, growth 5%, required return 10%.</p></div>
+        <div class="formula-box">
+          <div class="eq">profit margin = E₀/S₀ = 4.25/218.75 = 0.0194</div>
+          <div class="eq">justified P/S = 0.0194 × 0.40 × 1.05 / (0.10−0.05) = <strong>0.163×</strong></div>
+        </div>
+        <p class="nudge"><span class="ic">✅</span><span class="nudge-text"> Active recall before moving on: without looking, write the three justified-multiple formulas (P/E trailing, P/B, P/S) from memory. Each is the Gordon growth model wearing a different disguise.</span></p>
+      </div>
+
+      <div class="deck-block">
+        <h3>Active recall — LOS 20.i flashcards</h3>
+        <div class="deck-holder" id="deck-holder-i"></div>
+      </div>
+    </div>
+
+    <!-- ============ LOS 20.j ============ -->
+    <div class="view" id="view-j">
+      <span class="los-tag">LOS 20.j</span><span class="module-tag">MODULE 20.4</span>
+      <h1 class="section-title">The P/E-to-Growth (PEG) Ratio</h1>
+      <p class="section-sub">Calculate and interpret PEG and explain its use in relative valuation.</p>
+      <div class="theory">
+        <p>Justified P/E is positively related to the growth rate — so comparing raw P/E across firms with very different growth rates is misleading. The <strong>PEG ratio</strong> "standardizes" P/E by growth:</p>
+        <div class="formula-box"><div class="eq">PEG ratio = (P/E ratio) / g &nbsp;&nbsp;<span style="font-size:12px; color:#E4DCC8;">(g expressed as a whole number, e.g. 14.5 not 0.145)</span></div></div>
+        <p>PEG is interpreted as <strong>"P/E per unit of expected growth."</strong> The valuation rule: <strong>stocks with lower PEGs are more attractive than stocks with higher PEGs</strong>, assuming similar risk.</p>
+        <div class="callout"><span class="callout-label">Worked example — Med-Ready, Inc.</span><p>Leading P/E = 28.75, 5-year consensus growth = 14.5%. Median PEG for a comparable-risk peer group = 2.34.</p></div>
+        <div class="formula-box">
+          <div class="eq">Med-Ready PEG = 28.75 / 14.5 = <strong>1.98</strong></div>
+          <div class="fdef"><div>1.98 &lt; peer median 2.34 → Med-Ready appears <b>undervalued</b>. Caveat: confirm the peer PEGs also use leading P/E, and that the peers are truly comparable in risk.</div></div>
+        </div>
+        <div class="callout"><span class="callout-label">Worked example — Party Favors, Inc.</span><p>Leading P/E = 18.75, growth = 15.32%. Peer median PEG (leading-P/E basis) = 0.92.</p></div>
+        <div class="formula-box">
+          <div class="eq">Party Favors PEG = 18.75 / 15.32 = <strong>1.22</strong></div>
+          <div class="fdef"><div>1.22 &gt; peer median 0.92 → Party Favors appears <b>overvalued</b>.</div></div>
+        </div>
+
+        <h4>Three drawbacks of the PEG ratio</h4>
+        <ol>
+          <li>The relationship between P/E and g is <strong>not linear</strong>, which makes comparisons difficult.</li>
+          <li>PEG still <strong>doesn't account for risk</strong>.</li>
+          <li>PEG doesn't reflect the <strong>duration of the high-growth period</strong> in a multistage model — especially misleading if the analyst uses a short-term high-growth forecast.</li>
+        </ol>
+      </div>
+
+      <div class="deck-block">
+        <h3>Active recall — LOS 20.j flashcards</h3>
+        <div class="deck-holder" id="deck-holder-j"></div>
+      </div>
+    </div>
+
+    <!-- ============ LOS 20.k ============ -->
+    <div class="view" id="view-k">
+      <span class="los-tag">LOS 20.k</span><span class="module-tag">MODULE 20.4</span>
+      <h1 class="section-title">Price Multiples for Terminal Value in a Multistage DCF</h1>
+      <p class="section-sub">Calculate and explain the use of price multiples in determining terminal value in a multistage DCF model.</p>
+      <div class="theory">
+        <p>A terminal value at the end of the explicit forecast horizon should reflect the growth the firm can sustain <strong>over the long run</strong> beyond that point. Analysts often use terminal price multiples (P/E, P/B, P/S, P/CF) instead of a perpetuity-growth formula. Regardless of which ratio, the logic is the same:</p>
+        <div class="formula-box"><div class="eq">terminal value = price multiple × fundamental variable</div></div>
+
+        <div class="ratio-grid">
+          <div class="ratio-card">
+            <div class="rname">Based on fundamentals</div>
+            <div class="rformula">= justified price multiple × forecast of the fundamental variable</div>
+            <div class="ruse">Requires estimates of growth rate, required return, and payout ratio. Weakness: needs many inputs, each a source of estimation error.</div>
+          </div>
+          <div class="ratio-card hi">
+            <div class="rname">Based on comparables</div>
+            <div class="rformula">= benchmark price multiple × forecast of the fundamental variable</div>
+            <div class="ruse">Strength: uses market data exclusively. Weakness: a benchmark that is itself mispriced transfers that error straight into your terminal value.</div>
+          </div>
+        </div>
+        <div class="formula-box">
+          <div class="eq">terminal value in year n = (justified <u>leading</u> P/E) × (forecasted earnings in year n+1)</div>
+          <div class="eq" style="margin-top:8px;">terminal value in year n = (justified <u>trailing</u> P/E) × (forecasted earnings in year n)</div>
+        </div>
+        <div class="callout"><span class="callout-label">Worked example — Polar Technology</span><p>EPS in Year 5 forecast = C$2.10; EPS in Year 6 forecast = C$2.32; median trailing industry P/E = 35. Find terminal value in Year 5.</p></div>
+        <div class="formula-box">
+          <div class="eq">terminal value (Year 5) = (benchmark <u>trailing</u> P/E) × (Year 5 EPS) = 35 × C$2.10 = <strong>C$73.50</strong></div>
+          <div class="fdef"><div>Watch the trap: since we're using <b>trailing</b> P/E, we multiply by <b>Year 5</b> earnings (C$2.10) — not the Year 6 forecast (C$2.32), which would be needed only for a <em>leading</em>-P/E terminal value.</div></div>
+        </div>
+      </div>
+
+      <div class="deck-block">
+        <h3>Active recall — LOS 20.k flashcards</h3>
+        <div class="deck-holder" id="deck-holder-k"></div>
+      </div>
+    </div>
+
+    <!-- ============ LOS 20.l ============ -->
+    <div class="view" id="view-l">
+      <span class="los-tag">LOS 20.l</span><span class="module-tag">METHOD OF COMPARABLES</span>
+      <h1 class="section-title">Evaluating Over-, Fairly, or Undervalued via Comparisons of Multiples</h1>
+      <p class="section-sub">Evaluate whether a stock is overvalued, fairly valued, or undervalued based on comparisons of multiples.</p>
+      <div class="theory">
+        <div class="callout"><span class="callout-label">Professor's note — terminology</span><p>"Benchmark value of a multiple" is another name for the <strong>justified price multiple using the method of comparables</strong>. The reading uses "benchmark" here to match the LOS wording — don't treat it as a new concept.</p></div>
+
+        <h4>The four-step benchmarking process</h4>
+        <div class="steps-flow">
+          <div class="step-node"><div class="sn-num">1</div><div class="sn-txt">Select and calculate the multiple to be used</div></div>
+          <div class="step-connector">→</div>
+          <div class="step-node"><div class="sn-num">2</div><div class="sn-txt">Select the benchmark; calculate mean/median of its multiple over the comparable group</div></div>
+          <div class="step-connector">→</div>
+          <div class="step-node"><div class="sn-num">3</div><div class="sn-txt">Compare the stock's multiple to the benchmark</div></div>
+          <div class="step-connector">→</div>
+          <div class="step-node"><div class="sn-num">4</div><div class="sn-txt">Check whether the difference is explained by fundamentals; make valuation adjustments</div></div>
+        </div>
+
+        <h4>Frequently used P/E benchmarks</h4>
+        <ul>
+          <li>P/E of another company's stock in a similar industry with similar operating characteristics.</li>
+          <li>Average or median P/E of the peer group within the company's industry.</li>
+          <li>Average or median P/E for the industry.</li>
+          <li>P/E of an equity index.</li>
+          <li>The stock's own average historical P/E.</li>
+        </ul>
+
+        <div class="callout"><span class="callout-label">Worked example — Allbright Interiors vs. Basic Designs</span>
+        <div class="table-scroll"><table class="mini"><tr><th></th><th>Trailing P/E</th><th>Leading P/E</th><th>5-yr growth</th><th>Beta</th></tr>
+        <tr><td>Allbright</td><td>10.0</td><td>8.7</td><td>11.0%</td><td>1.3</td></tr>
+        <tr><td>Basic Designs</td><td>14.0</td><td>12.7</td><td>9.0%</td><td>1.4</td></tr>
+        <tr><td>Peer median</td><td>13.3</td><td>12.1</td><td>11.0%</td><td>1.3</td></tr></table></div></div>
+        <div class="formula-box"><div class="fdef">
+          <div><b>Allbright:</b> P/E below the peer median (10.0 vs 13.3) despite a <em>comparable</em> growth rate (11.0% vs 11.0%) and beta (1.3 vs 1.3) → since the fundamentals match the benchmark but the multiple doesn't, Allbright appears genuinely <b>undervalued</b>.</div>
+          <div style="margin-top:8px;"><b>Basic Designs:</b> P/E above the peer median (14.0 vs 13.3) despite <em>lower</em> growth (9.0% vs 11.0%) and <em>higher</em> risk (beta 1.4 vs 1.3) — both factors that should <em>lower</em> its justified P/E, not raise it. This makes Basic Designs look <b>overvalued</b> relative to the benchmark.</div>
+        </div></div>
+
+        <p class="nudge"><span class="ic">💡</span><span class="nudge-text"> P/B and P/S valuation by comparables follow the exact same 4 steps, with two practical differences: (1) book-value and sales forecasts are far less widely available than EPS forecasts, so analysts typically use <strong>trailing</strong> book value / sales rather than forward estimates; (2) the fundamentals you must control for differ — <strong>ROE</strong>, risk, and growth for P/B; <strong>profit margin</strong>, growth, risk, and accounting-data quality for P/S.</span></p>
+
+        <div class="callout"><span class="callout-label">Professor's note — look-ahead bias</span><p>When backtesting a screening strategy based on price multiples or other data, avoid <strong>look-ahead bias</strong> — using information that was not actually available at the historical point in time when the stocks would have been selected.</p></div>
+      </div>
+
+      <div class="deck-block">
+        <h3>Active recall — LOS 20.l flashcards</h3>
+        <div class="deck-holder" id="deck-holder-l"></div>
+      </div>
+    </div>
+
+    <!-- ============ LOS 20.m ============ -->
+    <div class="view" id="view-m">
+      <span class="los-tag">LOS 20.m</span><span class="module-tag">METHOD OF COMPARABLES</span>
+      <h1 class="section-title">The Role of Fundamentals in the Method of Comparables</h1>
+      <p class="section-sub">Evaluate a stock by the method of comparables and explain the importance of fundamentals in using it.</p>
+      <div class="theory">
+        <p>The basic idea: compare a stock's multiple to a benchmark. Firms with multiples <strong>below</strong> the benchmark are (tentatively) undervalued; firms <strong>above</strong> are (tentatively) overvalued. But this conclusion is only valid if the stock's <strong>fundamentals are similar</strong> to the benchmark's — you must compare apples to apples.</p>
+
+        <div class="callout">
+          <span class="callout-label">The three possible explanations when P/E &lt; benchmark</span>
+          <div class="criteria-list">
+            <div class="criteria-item"><div class="cnum">1</div><div class="ctxt"><b>The stock is genuinely undervalued.</b></div></div>
+            <div class="criteria-item"><div class="cnum">2</div><div class="ctxt"><b>The stock is properly valued</b>, but has a <em>lower expected growth rate</em> than the benchmark — which alone justifies a lower P/E.</div></div>
+            <div class="criteria-item"><div class="cnum">3</div><div class="ctxt"><b>The stock is properly valued</b>, but has a <em>higher required return (higher risk)</em> than the benchmark — which alone justifies a lower P/E.</div></div>
+          </div>
+        </div>
+        <p>Only if growth and risk are genuinely comparable to the benchmark can you conclude explanation #1 (true undervaluation) rather than #2 or #3 (properly-priced-but-different-fundamentals).</p>
+
+        <div class="callout"><span class="callout-label">Worked example — Crisco Systems &amp; Soothsayer vs. industry peers</span>
+        <p>Crisco (Networking Products industry): P/B 4.45, P/S 6.60. Soothsayer (Enterprise Software/Services industry): P/B 10.04, P/S 6.71.</p>
+        <div class="table-scroll"><table class="mini"><tr><th>Peer group</th><th>Mean P/B</th><th>Median P/B</th><th>Mean P/S</th><th>Median P/S</th></tr>
+        <tr><td>Networking Products</td><td>2.065</td><td>1.170</td><td>3.733</td><td>0.900</td></tr>
+        <tr><td>Enterprise Software/Svcs</td><td>7.866</td><td>2.770</td><td>3.341</td><td>1.920</td></tr></table></div></div>
+        <div class="formula-box"><div class="fdef">
+          <div><b>Crisco:</b> P/B (4.45) exceeds both peer mean (2.065) and median (1.170); P/S (6.60) exceeds both peer mean (3.733) and median (0.900) → Crisco appears <b>overvalued</b> by both measures.</div>
+          <div style="margin-top:8px;"><b>Soothsayer:</b> P/B (10.04) exceeds both peer mean (7.866) and median (2.770); P/S (6.71) exceeds both peer mean (3.341) and median (1.920) → Soothsayer also appears <b>overvalued</b> by both measures.</div>
+          <div style="margin-top:8px;">Notice the large mean-vs-median gap in each peer group (e.g., Enterprise Software mean P/B 7.866 vs. median 2.770) — a clear sign of <b>outliers</b> distorting the mean.</div>
+        </div></div>
+
+        <h4>Extending the logic to EV/EBITDA and dividend yield</h4>
+        <ul>
+          <li><strong>EV/EBITDA:</strong> a lower ratio relative to peers indicates relative undervaluation; a higher ratio indicates overvaluation — same logic as P/E, P/B, P/S.</li>
+          <li><strong>Dividend yield:</strong> compare the target's yield to peers (identified on the basis of comparable risk). A <strong>high yield relative to the benchmark indicates undervaluation</strong>, all else equal — but pay particular attention to whether the yield gap is really explained by a growth-rate difference instead.</li>
+        </ul>
+      </div>
+
+      <div class="deck-block">
+        <h3>Active recall — LOS 20.m flashcards</h3>
+        <div class="deck-holder" id="deck-holder-m"></div>
+      </div>
+    </div>
+
+    <!-- ============ LOS 20.n ============ -->
+    <div class="view" id="view-n">
+      <span class="los-tag">LOS 20.n</span><span class="module-tag">MODULE 20.4</span>
+      <h1 class="section-title">Alternative Definitions of Cash Flow for P/CF and EV Multiples</h1>
+      <p class="section-sub">Explain alternative definitions of cash flow used in price and enterprise value multiples, and describe the limitations of each.</p>
+      <div class="theory">
+        <p>There are (at least) <strong>four</strong> definitions of cash flow available for the P/CF ratio — expect any one of them to appear on the exam.</p>
+
+        <div class="app-grid">
+          <div class="app-card"><div class="aic">➕</div><div class="at">1. Earnings-plus-noncash-charges (CF)</div><div class="ad">CF = net income + depreciation + amortization. <strong>Limitation:</strong> ignores noncash revenue and changes in net working capital.</div></div>
+          <div class="app-card"><div class="aic">📊</div><div class="at">2. Adjusted cash flow (adjusted CFO)</div><div class="ad">CFO from the cash flow statement, adjusted for nonrecurring items (after-tax). <strong>Limitation:</strong> US GAAP requires interest paid/received and dividends received in CFO; IFRS is more flexible (interest paid can be operating or financing; interest/dividends received can be operating or investing) — creates cross-standard comparability issues.</div></div>
+          <div class="app-card"><div class="aic">💰</div><div class="at">3. Free cash flow to equity (FCFE)</div><div class="ad">FCFE = CFO − FCInv + net borrowing. Theoretically <strong>preferred</strong> definition — but <strong>more volatile</strong> than straight cash flow.</div></div>
+          <div class="app-card"><div class="aic">🏭</div><div class="at">4. EBITDA</div><div class="ad">Earnings before interest, taxes, depreciation, amortization. A <strong>pretax, pre-interest</strong> measure — a flow to <em>both</em> equity and debt holders, so it's better suited as an indicator of <strong>total company value</strong> than of equity value alone (see LOS 20.o).</div></div>
+        </div>
+
+        <div class="formula-box">
+          <div class="label">FCFE (full formula, from Reading 19)</div>
+          <div class="eq">FCFE = CFO − FCInv + net borrowing</div>
+          <div class="fdef"><div>FCInv = fixed capital investment; net borrowing = (LT + ST debt issues) − (LT + ST debt repayments)</div></div>
+        </div>
+        <div class="formula-box"><div class="eq">P/CF = market value of equity / cash flow = market price per share / cash flow per share</div></div>
+        <p>Analysts typically use the <strong>trailing</strong> P/CF ratio — the most recent four quarters of cash flow per share.</p>
+
+        <div class="callout"><span class="callout-label">Worked example — Data Management Systems (DMS)</span><p>Net income $32M, D&amp;A $41M, net interest expense $12M, CFO $44M, tax rate 30%. 25M shares outstanding, price $47/share. Calculate P/CF using CF (earnings-plus-noncash-charges) as the proxy.</p></div>
+        <div class="formula-box">
+          <div class="eq">CF = $32M + $41M = $73M</div>
+          <div class="eq">market value of equity = 25M × $47 = $1,175M</div>
+          <div class="eq">P/CF = $1,175M / $73M = <strong>16.1×</strong></div>
+          <div class="fdef"><div>Note that net interest expense and the tax rate were <b>not needed</b> for this particular CF definition — a common distractor pattern in P/CF problems.</div></div>
+        </div>
+      </div>
+
+      <div class="deck-block">
+        <h3>Active recall — LOS 20.n flashcards</h3>
+        <div class="deck-holder" id="deck-holder-n"></div>
+      </div>
+    </div>
+
+    <!-- ============ LOS 20.o ============ -->
+    <div class="view" id="view-o">
+      <span class="los-tag">LOS 20.o</span><span class="module-tag">MODULE 20.4</span>
+      <h1 class="section-title">Enterprise Value Multiples and EV/EBITDA</h1>
+      <p class="section-sub">Calculate and interpret EV multiples and evaluate the use of EV/EBITDA.</p>
+      <div class="theory">
+        <p>Because EBITDA is a flow to <em>both</em> equity and debt, it should be compared against a numerator that measures <strong>total company value</strong>, not just equity value. That numerator is <strong>enterprise value (EV)</strong>.</p>
+        <div class="formula-box">
+          <div class="eq">EV = market value of common stock + market value of preferred equity + market value of debt + minority interest − cash and investments</div>
+          <div class="fdef"><div>Rationale for subtracting cash &amp; investments: an acquirer's <em>net</em> price paid for a target would effectively be lowered by the amount of the target's liquid assets it acquires along with it.</div></div>
+        </div>
+
+        <div class="illus-block">
+          <div class="illus-title">EV build-up as a waterfall (Boulevard Industries numbers, Sf millions)</div>
+          <div class="waterfall">
+            <div class="wf-step base"><span>Market value of equity (22.50 × 40)</span><span>Sf 900.0</span></div>
+            <div class="wf-step plus"><span>+ Market value of debt</span><span>Sf 137.0</span></div>
+            <div class="wf-step minus"><span>− Cash &amp; marketable securities</span><span>Sf 62.3</span></div>
+            <div class="wf-step minus"><span>− Investments</span><span>Sf 327.0</span></div>
+            <div class="wf-step result"><span>= Enterprise Value</span><span>Sf 647.7</span></div>
+          </div>
+        </div>
+        <div class="callout"><span class="callout-label">Professor's note</span><p>Assume minority interest and preferred equity are zero unless the problem states otherwise — this is the typical exam setup. If given values for either, include them.</p></div>
+
+        <div class="formula-box">
+          <div class="label">EV/EBITDA ratio</div>
+          <div class="eq">EV/EBITDA = enterprise value / EBITDA</div>
+          <div class="fdef">
+            <div>enterprise value = market value of common stock + market value of debt − cash and investments (assuming no preferred/minority interest)</div>
+            <div>EBITDA = recurring earnings from continuing operations + interest + taxes + depreciation + amortization &nbsp;<em>or, for forecasting</em>&nbsp; = EBIT + depreciation + amortization</div>
+          </div>
+        </div>
+
+        <div class="ratio-grid">
+          <div class="ratio-card hi">
+            <div class="rname">✅ EV/EBITDA is useful when…</div>
+            <div class="ruse">• More useful than P/E when comparing firms with different degrees of <strong>financial leverage</strong>.<br>• Useful for valuing <strong>capital-intensive</strong> businesses with high D&amp;A.<br>• EBITDA is <strong>usually positive</strong> even when EPS is not.</div>
+          </div>
+          <div class="ratio-card">
+            <div class="rname">⚠️ Drawbacks</div>
+            <div class="ruse">• If working capital is growing, EBITDA will <strong>overstate CFO</strong>; ignores how revenue-recognition policy affects CFO.<br>• FCFF captures capex, so it's more strongly linked to valuation theory than EBITDA — EBITDA is adequate only if <strong>capex ≈ depreciation</strong>.</div>
+          </div>
+        </div>
+
+        <div class="callout"><span class="callout-label">Worked example — Boulevard Industries (Sf = Swiss francs)</span>
+        <div class="table-scroll"><table class="mini"><tr><td>Recent share price</td><td>Sf 22.50</td></tr><tr><td>Shares outstanding</td><td>40 million</td></tr><tr><td>Market value of debt</td><td>Sf 137 million</td></tr><tr><td>Cash &amp; marketable securities</td><td>Sf 62.3 million</td></tr><tr><td>Investments</td><td>Sf 327 million</td></tr><tr><td>Net income</td><td>Sf 137.5 million</td></tr><tr><td>Interest expense</td><td>Sf 6.9 million</td></tr><tr><td>D&amp;A</td><td>Sf 10.4 million</td></tr><tr><td>Taxes</td><td>Sf 95.9 million</td></tr></table></div></div>
+        <div class="formula-box">
+          <div class="eq">EBITDA = 137.5+6.9+95.9+10.4 = <strong>Sf 250.7M</strong></div>
+          <div class="eq">EV = (22.50×40) + 137 − 62.3 − 327 = <strong>Sf 647.7M</strong></div>
+          <div class="eq">EV/EBITDA = 647.7 / 250.7 = <strong>2.6×</strong></div>
+        </div>
+
+        <h4>Related measures</h4>
+        <ul>
+          <li><strong>Total invested capital (TIC)</strong> — a.k.a. market value of invested capital — is the market value of the company's equity and debt. Unlike EV, TIC <strong>includes</strong> cash and short-term investments (it is not subtracted).</li>
+          <li><strong>EV/Sales (EV/S)</strong> — an alternative to P/S, appropriate for comparing companies with significantly different capital structures.</li>
+          <li>Analysts also build EV ratios using EBIT or FCFF in the denominator.</li>
+        </ul>
+      </div>
+
+      <div class="deck-block">
+        <h3>Active recall — LOS 20.o flashcards</h3>
+        <div class="deck-holder" id="deck-holder-o"></div>
+      </div>
+    </div>
+
+    <!-- ============ LOS 20.p ============ -->
+    <div class="view" id="view-p">
+      <span class="los-tag">LOS 20.p</span><span class="module-tag">MODULE 20.4</span>
+      <h1 class="section-title">Sources of Differences in Cross-Border Valuation Comparisons</h1>
+      <p class="section-sub">Explain why comparing multiples across countries is harder than it looks.</p>
+      <div class="theory">
+        <p>Using relative valuation across borders is challenging because of differences in <strong>accounting methods, cultures, risk, and growth opportunities</strong>. Benchmarking itself is difficult: P/Es of individual firms in the <em>same industry</em> vary widely across countries, and country-level market P/Es vary significantly too.</p>
+
+        <div class="callout">
+          <span class="callout-label">Common categories of international accounting differences</span>
+          <div class="app-grid" style="margin-top:8px;">
+            <div class="app-card"><div class="at">Goodwill</div></div>
+            <div class="app-card"><div class="at">Deferred income taxes</div></div>
+            <div class="app-card"><div class="at">Foreign exchange adjustments</div></div>
+            <div class="app-card"><div class="at">R&amp;D treatment</div></div>
+            <div class="app-card"><div class="at">Pension expense</div></div>
+            <div class="app-card"><div class="at">Tangible asset revaluations</div></div>
+          </div>
+        </div>
+
+        <h4>Which ratios are most/least affected?</h4>
+        <div class="scale-track"><div class="scale-marker" style="left:8%;"></div><div class="scale-marker" style="left:82%;"></div></div>
+        <div class="scale-labels"><span>Least affected</span><span>Most affected</span></div>
+        <table class="dtable" style="margin-top:16px;">
+          <tr><th>Least affected</th><td><strong>P/FCFE</strong> — cash flow is much harder to distort via accounting choices than accrual-based figures.</td></tr>
+          <tr><th>Most affected</th><td><strong>P/B, P/E, P/EBITDA, EV/EBITDA</strong> — all more heavily influenced by management's choice of accounting methods and estimates.</td></tr>
+        </table>
+        <p class="nudge"><span class="ic">💡</span><span class="nudge-text"> The pattern: whichever multiple's denominator is closest to actual <strong>cash</strong> is least distorted by accounting choice; whichever depends most on <strong>accrual accounting judgment</strong> (depreciation policy, goodwill treatment, pension assumptions) is most distorted.</span></p>
+      </div>
+
+      <div class="deck-block">
+        <h3>Active recall — LOS 20.p flashcards</h3>
+        <div class="deck-holder" id="deck-holder-p"></div>
+      </div>
+    </div>
+
+    <!-- ============ LOS 20.q ============ -->
+    <div class="view" id="view-q">
+      <span class="los-tag">LOS 20.q</span><span class="module-tag">MODULE 20.4</span>
+      <h1 class="section-title">Momentum Indicators</h1>
+      <p class="section-sub">Describe momentum indicators and their use in valuation.</p>
+      <div class="theory">
+        <p><strong>Momentum indicators</strong> relate either the market price or a fundamental variable (like EPS) to the time series of its own historical or expected value. Common momentum indicators: earnings surprise, standardized unexpected earnings (SUE), and relative strength.</p>
+
+        <h4>Unexpected earnings (earnings surprise)</h4>
+        <div class="formula-box"><div class="eq">earnings surprise = reported EPS − expected EPS</div></div>
+        <p>Usually scaled by a measure of the variability of analysts' EPS forecasts. <strong>Economic rationale:</strong> positive surprises may lead to <strong>persistent positive abnormal returns</strong> (the market underreacts and keeps drifting up as the news is digested).</p>
+
+        <h4>Standardized unexpected earnings (SUE)</h4>
+        <div class="formula-box"><div class="eq">SUE = earnings surprise / standard deviation of earnings surprise</div></div>
+        <p>A given size of forecast error is <strong>more meaningful the smaller</strong> the size of historical forecast errors — SUE puts the surprise in context of how "surprising" surprises normally are for that stock. Economic rationale: <strong>persistence or reversal patterns</strong> may exist in stock returns.</p>
+
+        <h4>Relative strength indicators</h4>
+        <p>Compare a stock's price or return performance during a given period with <strong>its own historical performance</strong> or with a <strong>group of peer stocks</strong>. Economic rationale: patterns of persistence or reversal may exist in returns — and these patterns may depend on the length of an investor's time horizon.</p>
+
+        <table class="dtable">
+          <tr><th>Indicator</th><th>Compares…</th><th>Economic rationale</th></tr>
+          <tr><td>Earnings surprise</td><td>reported EPS vs. expected EPS</td><td>positive surprises → persistent positive abnormal returns</td></tr>
+          <tr><td>SUE</td><td>earnings surprise vs. its own historical volatility</td><td>persistence/reversal patterns in returns</td></tr>
+          <tr><td>Relative strength</td><td>a stock's own price/return performance over time, or vs. peers</td><td>persistence/reversal, possibly horizon-dependent</td></tr>
+        </table>
+      </div>
+
+      <div class="deck-block">
+        <h3>Active recall — LOS 20.q flashcards</h3>
+        <div class="deck-holder" id="deck-holder-q"></div>
+      </div>
+    </div>
+
+    <!-- ============ LOS 20.r ============ -->
+    <div class="view" id="view-r">
+      <span class="los-tag">LOS 20.r</span><span class="module-tag">MODULE 20.4</span>
+      <h1 class="section-title">Measures of Central Tendency for a Group of Multiples</h1>
+      <p class="section-sub">Explain the use of the arithmetic mean, harmonic mean, weighted harmonic mean, and median to describe a group of multiples.</p>
+      <div class="theory">
+        <p>A key insight: the P/E of a stock <strong>index or portfolio is NOT equal</strong> to the simple mean or weighted mean of its constituent P/Es. It is best calculated as the <strong>weighted harmonic mean</strong> P/E.</p>
+        <div class="formula-box"><div class="eq">weighted harmonic mean = 1 / Σ(wᵢ/Xᵢ)</div></div>
+
+        <div class="callout"><span class="callout-label">Worked example — 2-stock portfolio</span><p>Stock 1: price $10, EPS $1 (P/E = 10). Stock 2: price $16, EPS $2 (P/E = 8). Portfolio holds one share of each.</p></div>
+        <div class="formula-box">
+          <div class="eq">TRUE portfolio P/E = total price / total earnings = (10+16) / (1+2) = 26/3 = <strong>8.67×</strong></div>
+        </div>
+        <div class="illus-block">
+          <div class="illus-title">Four ways to average the same two P/Es (10 and 8) — only one matches the true portfolio P/E of 8.67</div>
+          <table class="dtable">
+            <tr><th>Measure</th><th>Calculation</th><th>Result</th></tr>
+            <tr><td>Arithmetic mean</td><td>(10+8)/2</td><td>9.00</td></tr>
+            <tr><td>Weighted arithmetic mean (by price weight: 10/26, 16/26)</td><td>(10/26)×10 + (16/26)×8</td><td>8.76</td></tr>
+            <tr><td>Harmonic mean (equal-weighted)</td><td>2 / [(1/10)+(1/8)]</td><td>8.89</td></tr>
+            <tr><td>Weighted harmonic mean (price-weighted)</td><td>1 / [(10/26)(1/10)+(16/26)(1/8)]</td><td><strong>8.67 ✓</strong></td></tr>
+          </table>
+        </div>
+        <p class="nudge"><span class="ic">💡</span><span class="nudge-text"> The <strong>weighted harmonic mean exactly equals the true portfolio P/E</strong> (26/3 = 8.67) — this is not a coincidence, it's a mathematical identity. This is why it's the theoretically correct way to average a group of multiples.</span></p>
+
+        <div class="illus-block">
+          <div class="illus-title">Visualizing the spread — true portfolio P/E is 8.67×</div>
+          <div class="bar-chart">
+            <div class="bar-col"><div class="bv">9.00</div><div class="bar" style="height:88%; background:var(--rust);"></div><div class="bl">Arithmetic mean</div></div>
+            <div class="bar-col"><div class="bv">8.89</div><div class="bar" style="height:86%; background:var(--rust-soft); border:1px solid var(--rust);"></div><div class="bl">Harmonic mean</div></div>
+            <div class="bar-col"><div class="bv">8.76</div><div class="bar" style="height:83%; background:var(--surface-2);"></div><div class="bl">Weighted arith. mean</div></div>
+            <div class="bar-col"><div class="bv">8.67 ✓</div><div class="bar" style="height:80%; background:var(--green);"></div><div class="bl">Weighted harmonic mean</div></div>
+          </div>
+        </div>
+
+        <h4>When to use which measure</h4>
+        <table class="dtable">
+          <tr><th>Measure</th><th>Effect on outliers</th></tr>
+          <tr><td><strong>Arithmetic mean</strong></td><td>Most affected by large (high) outliers — gets pulled <em>up</em> most easily.</td></tr>
+          <tr><td><strong>Harmonic mean</strong></td><td>Puts more weight on <em>smaller</em> values — most affected by small outliers.</td></tr>
+          <tr><td><strong>Median</strong></td><td>Reduces the impact of outliers generally — a robust middle value.</td></tr>
+          <tr><td><strong>Weighted harmonic mean</strong></td><td>The theoretically correct measure for a portfolio/index P/E; equals the harmonic mean when the portfolio is equally weighted.</td></tr>
+        </table>
+        <p>When outliers are present, the <strong>median</strong> or the <strong>weighted harmonic mean with outliers excluded</strong> may be the most appropriate measures for a portfolio or index multiple.</p>
+      </div>
+
+      <div class="deck-block">
+        <h3>Active recall — LOS 20.r flashcards</h3>
+        <div class="deck-holder" id="deck-holder-r"></div>
+      </div>
+    </div>
+
+    <!-- ============ REVIEW ============ -->
+    <div class="view" id="view-review">
+      <span class="los-tag">🔁 SPACED REVIEW</span>
+      <h1 class="section-title">Spaced Repetition Review</h1>
+      <p class="section-sub">Cards due for review, pulled from all 18 LOS using the 5-box Leitner system.</p>
+      <div class="deck-holder" id="review-deck"></div>
+    </div>
+
+    <!-- ============ QUIZ ============ -->
+    <div class="view" id="view-quiz">
+      <span class="los-tag">📝 MODULE QUIZ</span>
+      <h1 class="section-title">Timed Module Quiz</h1>
+      <p class="section-sub">Official Schweser Module Quiz questions (all 20) plus supplemental questions covering every LOS not directly tested by the official set.</p>
+      <div id="quiz-area"></div>
+    </div>
+
+    <!-- ============ PRACTICE ============ -->
+    <div class="view" id="view-practice">
+      <span class="los-tag">🧮 PRACTICE PROBLEMS</span>
+      <h1 class="section-title">Step-Reveal Practice Problems</h1>
+      <p class="section-sub">18 worked problems drawn directly from the Schweser Notes examples and Module Quiz vignettes — try each one yourself before revealing the steps.</p>
+      <div id="practice-area"></div>
+    </div>
+
+  </main>
+</div>
+<script type="module">
+const FLASHCARDS = {
+a: [
+  {id:'a1', q:`What is the <b>method of comparables</b>, and what economic law underlies it?`, a:`Values a stock using the <b>average price multiple</b> of similar companies. Rooted in the <b>Law of One Price</b>: two similar assets should sell at comparable price multiples. It is a <b>relative</b> valuation method.`},
+  {id:'a2', q:`What is the <b>method of forecasted fundamentals</b>, and what underlies it?`, a:`Values a stock using the ratio of its <b>DCF-model value</b> to a fundamental variable. Rooted in DCF theory: value = PV of expected future cash flows at the risk-adjusted required return. Produces an <b>absolute</b> justified multiple.`},
+  {id:'a3', q:`The method of comparables can only conclude a stock is over/undervalued relative to what?`, a:`Relative to the <b>benchmark only</b> — it cannot state an absolute intrinsic value. That's the job of the method of forecasted fundamentals.`},
+  {id:'a4', q:`MK Technologies trades at $50 with trailing EPS $2; the industry average trailing P/E is 32×. By the method of comparables, is MK over- or undervalued?`, a:`<b>Undervalued.</b> MK's trailing P/E = 50/2 = 25×, below the 32× industry average.`},
+],
+b: [
+  {id:'b1', q:`Define "justified price multiple."`, a:`What the multiple <b>should be</b> if the stock is fairly valued — derived from either (1) the comparables benchmark, or (2) a forecasted-fundamentals (DCF-based) model.`},
+  {id:'b2', q:`State the universal rule: actual multiple vs. justified multiple.`, a:`Actual &gt; Justified → <b>overvalued</b>. Actual &lt; Justified → <b>undervalued</b> (holding risk and growth equal).`},
+  {id:'b3', q:`Name the two different ways a "justified" multiple can be derived.`, a:`(1) <b>Method of comparables</b> — justified multiple = the benchmark's current multiple. (2) <b>Method of forecasted fundamentals</b> — justified multiple = calculated from a DCF model (e.g., Gordon growth).`},
+],
+c: [
+  {id:'c1', q:`Give the two main rationales for using the P/E ratio.`, a:`(1) Earnings power (EPS) is the primary <b>determinant of investment value</b>. (2) P/E is <b>popular</b> and easy to communicate in the investment community.`},
+  {id:'c2', q:`Give three drawbacks of the P/E ratio.`, a:`(1) Earnings can be <b>negative</b> → meaningless ratio. (2) The <b>volatile, transitory</b> portion of earnings makes interpretation hard. (3) Management <b>discretion</b> in allowed accounting practices can distort reported earnings.`},
+  {id:'c3', q:`Give the four rationales for using the P/B ratio.`, a:`(1) Book value is usually <b>positive even with a loss</b>. (2) <b>More stable</b> than EPS. (3) Appropriate net-asset measure for <b>liquid-asset firms</b> (finance/investment/insurance/banking). (4) Useful for firms expected to <b>go out of business</b>.`},
+  {id:'c4', q:`Give the four drawbacks of the P/B ratio.`, a:`(1) Ignores <b>intangible</b> assets (human capital). (2) Business model may dictate <b>asset-base size</b>, distorting comparisons. (3) Different <b>accounting conventions</b>. (4) <b>Inflation/technological change</b> can separate book from market values.`},
+  {id:'c5', q:`Give the four rationales for using the P/S ratio.`, a:`(1) Meaningful even for <b>distressed firms</b> (sales rarely negative). (2) <b>Harder to manipulate</b> than EPS/book value. (3) <b>Less volatile</b> than P/E. (4) Good for <b>mature/cyclical industries</b> and start-ups with no earnings.`},
+  {id:'c6', q:`Give the three drawbacks of the P/S ratio.`, a:`(1) High sales growth <b>≠ high profit</b> or cash flow. (2) Doesn't capture <b>cost-structure differences</b> across firms. (3) <b>Revenue recognition</b> practices can still distort sales forecasts.`},
+  {id:'c7', q:`Give the four rationales for using the P/CF ratio.`, a:`(1) Cash flow is <b>harder to manipulate</b> than earnings. (2) <b>More stable</b> than P/E. (3) Handles <b>earnings-quality</b> differences. (4) Empirically linked to <b>long-run stock returns</b>.`},
+  {id:'c8', q:`What is the main drawback pattern for P/CF, and where does it come from?`, a:`Drawbacks trace to the <b>cash-flow definition used</b>: "earnings-plus-noncash-charges" ignores noncash revenue and working-capital changes; FCFE (theoretically preferred) is <b>more volatile</b> than straight cash flow.`},
+  {id:'c9', q:`Give the two rationales for using dividend yield.`, a:`(1) Contributes to <b>total investment return</b>. (2) Dividends are <b>less risky</b> than the capital-appreciation component of return.`},
+  {id:'c10', q:`Give the two drawbacks of dividend yield.`, a:`(1) <b>Ignores capital appreciation</b> entirely. (2) Implies a <b>trade-off between current and future</b> cash flows (high payout today can mean lower future growth).`},
+],
+d: [
+  {id:'d1', q:`Write the trailing P/E formula.`, a:`trailing P/E = market price per share / <b>EPS over previous 12 months</b>.`},
+  {id:'d2', q:`Write the leading P/E formula.`, a:`leading P/E = market price per share / <b>forecasted EPS over next 12 months</b>.`},
+  {id:'d3', q:`Write the P/B formula and define book value of equity.`, a:`P/B = market price per share / book value per share. Book value of equity = common shareholders' equity = <b>(total assets − total liabilities) − preferred stock</b>.`},
+  {id:'d4', q:`Name the three common adjustments to book value for better comparability.`, a:`(1) <b>Tangible book value</b> = book value of equity − intangible assets. (2) Adjust for significant <b>off-balance-sheet</b> assets/liabilities. (3) Adjust items to <b>ensure comparability</b> across firms.`},
+  {id:'d5', q:`Write the P/S formula.`, a:`P/S = market price per share / sales per share = market value of equity / total sales.`},
+  {id:'d6', q:`Write the general P/CF formula, and name the 4 possible cash-flow definitions.`, a:`P/CF = market price per share / cash flow per share, where cash flow = <b>CF (earnings+noncash charges), adjusted CFO, FCFE, or EBITDA</b>.`},
+  {id:'d7', q:`Write the trailing dividend yield (D/P) formula.`, a:`trailing D/P = (4 × most recent quarterly dividend) / market price per share.`},
+  {id:'d8', q:`Write the leading dividend yield (D/P) formula.`, a:`leading D/P = (forecasted dividends over next four quarters) / market price per share.`},
+  {id:'d9', q:`Byron Investments: price €18.00, current EPS €0.80, forecasted next-year EPS €1.00. Find trailing and leading P/E.`, a:`Trailing P/E = 18.00/0.80 = <b>22.5×</b>. Leading P/E = 18.00/1.00 = <b>18.0×</b>.`},
+  {id:'d10', q:`Crisco Systems: book value of equity $28,039M, 7,001M shares, price $17.83. Find P/B.`, a:`BVPS = 28,039/7,001 = $4.01. P/B = 17.83/4.01 = <b>4.45×</b>.`},
+  {id:'d11', q:`Soothsayer Corp.: sales $9,475M, 5,233M shares, price $12.15. Find P/S.`, a:`Sales/share = 9,475/5,233 = $1.81. P/S = 12.15/1.81 = <b>6.71×</b>.`},
+  {id:'d12', q:`OnePrice Inc.: price $47.50, most recent quarterly dividend $0.50, next 4 quarters forecast $0.50/$0.55/$0.60/$0.65. Find trailing and leading D/P.`, a:`Trailing D/P = (4×0.50)/47.50 = <b>4.2%</b>. Leading D/P = (0.50+0.55+0.60+0.65)/47.50 = 2.30/47.50 = <b>4.8%</b>.`},
+],
+e: [
+  {id:'e1', q:`Define "underlying earnings" and list the items excluded.`, a:`Persistent/continuing/core earnings — <b>exclude nonrecurring components</b>: gains/losses from asset sales, asset write-downs, provisions for future losses, and changes in accounting estimates. Use <b>diluted EPS</b> as the starting point.`},
+  {id:'e2', q:`Rule of thumb: when adjusting reported EPS to underlying earnings, do you add or subtract a nonrecurring GAIN? A nonrecurring LOSS/expense?`, a:`<b>Subtract</b> nonrecurring gains (they inflated earnings). <b>Add back</b> nonrecurring losses/expenses (they depressed earnings).`},
+  {id:'e3', q:`Name the two methods of calculating normalized earnings.`, a:`(1) <b>Method of historical average EPS</b> — average EPS over the most recent business cycle. (2) <b>Method of average ROE</b> — average ROE × current BVPS.`},
+  {id:'e4', q:`Which normalization method is generally preferred, and why?`, a:`The <b>method of average ROE</b> — reliance on current BVPS reflects the effect of <b>firm-size changes</b> more accurately than the historical-average-EPS method.`},
+  {id:'e5', q:`Define the Molodovsky effect.`, a:`The <b>countercyclical tendency</b> to see high P/Es at the <b>bottom</b> of the earnings cycle (EPS temporarily depressed) and low P/Es at the <b>top</b> of the cycle (EPS temporarily inflated).`},
+],
+f: [
+  {id:'f1', q:`Define earnings yield (E/P) and explain why it's used instead of P/E.`, a:`E/P = EPS / market price per share. Used because <b>price is never negative</b>, so E/P stays meaningful even when earnings (and thus P/E) are negative or meaningless.`},
+  {id:'f2', q:`Interpret a high E/P vs. a low E/P.`, a:`A <b>high E/P</b> suggests a <b>cheap</b> security; a <b>low E/P</b> suggests an <b>expensive</b> security — securities can be ranked cheap-to-expensive by E/P.`},
+],
+g: [
+  {id:'g1', q:`What two fundamental factors drive the justified P/E, and in which direction?`, a:`<b>Positively</b> related to the expected growth rate (g); <b>inversely</b> related to the required rate of return (r).`},
+  {id:'g2', q:`What drives the justified P/B ratio?`, a:`P/B <b>increases as ROE increases</b>. The larger the spread between <b>ROE and r</b>, all else equal, the higher the P/B.`},
+  {id:'g3', q:`What drives the justified P/S ratio, through how many channels?`, a:`Net profit margin drives P/S through <b>two channels</b>: directly (it's a multiplicative factor) and indirectly through its effect on the sustainable growth rate g. P/S also rises with the earnings growth rate.`},
+  {id:'g4', q:`What drives the justified P/CF ratio?`, a:`P/CF increases when the <b>required return decreases</b> or the <b>growth rate increases</b>.`},
+  {id:'g5', q:`What drives the justified EV/EBITDA ratio?`, a:`<b>Positively</b> related to the growth rate in FCFF and EBITDA; <b>negatively</b> related to the firm's overall risk and WACC.`},
+  {id:'g6', q:`What drives the justified dividend yield?`, a:`<b>Positively</b> related to the required rate of return (r); <b>negatively</b> related to the forecasted growth rate in dividends.`},
+],
+h: [
+  {id:'h1', q:`Define a cross-sectional regression.`, a:`A regression in which the explained and explanatory variables are <b>all measured at the same point in time</b> (e.g., across many peer firms today).`},
+  {id:'h2', q:`Define "predicted P/E."`, a:`A P/E estimated from a <b>linear regression</b> of historical P/Es on fundamental variables (e.g., payout, growth, beta) across peer firms.`},
+  {id:'h3', q:`Name the three limitations of the cross-sectional regression methodology.`, a:`(1) Predictive power for a <b>different time period/sample</b> is uncertain. (2) Relationships <b>may change over time</b>. (3) <b>Multicollinearity</b> makes individual coefficients hard to interpret.`},
+  {id:'h4', q:`Define multicollinearity.`, a:`High correlation between two or more <b>independent variables</b> in a multiple regression, which makes individual coefficients unreliable to interpret.`},
+  {id:'h5', q:`Utility: payout 0.50, beta 0.95, growth 0.06. Regression: predicted P/E = 6.75 + 4.00×payout + 12.35×growth − 0.5×beta. Actual P/E is 12.0. Over- or underpriced?`, a:`Predicted P/E = 6.75+(4×0.50)+(12.35×0.06)−(0.5×0.95) = <b>9.02</b>. Actual (12.0) &gt; predicted (9.02) → <b>overpriced</b>.`},
+],
+i: [
+  {id:'i1', q:`Write the justified trailing P/E formula.`, a:`justified trailing P/E = (1−b)×(1+g) / (r−g), where (1−b) is the payout ratio.`},
+  {id:'i2', q:`Write the justified leading P/E formula.`, a:`justified leading P/E = (1−b) / (r−g).`},
+  {id:'i3', q:`How are justified trailing and leading P/E related?`, a:`justified trailing P/E = justified leading P/E × <b>(1+g)</b> — trailing is always larger when earnings are growing.`},
+  {id:'i4', q:`Besides growth and required return, what third factor is positively related to justified P/E?`, a:`The <b>inflation pass-through rate</b> — a firm better able to pass rising costs to customers should carry a higher P/E than an otherwise-similar peer.`},
+  {id:'i5', q:`Write the justified P/B formula.`, a:`justified P/B = (ROE − g) / (r − g).`},
+  {id:'i6', q:`ROE 14%, r 8%, g 4%. Find justified P/B.`, a:`(0.14−0.04)/(0.08−0.04) = 0.10/0.04 = <b>2.5×</b>.`},
+  {id:'i7', q:`Write the justified P/S formula (trailing sales basis).`, a:`justified P₀/S₀ = (E₀/S₀) × (1−b) × (1+g) / (r−g).`},
+  {id:'i8', q:`What's the shortcut formula linking justified P/S to justified P/E?`, a:`justified P/S = <b>net profit margin × justified trailing P/E</b>.`},
+  {id:'i9', q:`Payout 40%, ROE 8.3%, EPS $4.25, sales/share $218.75, g 5%, r 10%. Find justified P/S.`, a:`Profit margin = 4.25/218.75 = 0.0194. Justified P/S = 0.0194×0.40×1.05/0.05 = <b>0.163×</b>.`},
+  {id:'i10', q:`Comtronics: price $30, next-year EPS $4, g 5%, payout 60%, r 14%. Find the justified leading P/E and compare to the actual leading P/E.`, a:`Justified leading P/E = (1−0.60)/(0.14−0.05) = 0.40/0.09 = <b>6.67×</b>. Actual leading P/E = 30/4 = 7.5× &gt; 6.67× → <b>overvalued</b>.`},
+],
+j: [
+  {id:'j1', q:`Write the PEG ratio formula.`, a:`PEG = (P/E ratio) / g, with g expressed as a whole number (e.g., 14.5, not 0.145).`},
+  {id:'j2', q:`How is PEG interpreted, and what's the valuation rule?`, a:`Interpreted as "<b>P/E per unit of expected growth</b>." Lower PEG = more attractive, assuming similar risk.`},
+  {id:'j3', q:`Med-Ready: leading P/E 28.75, growth 14.5%, peer median PEG 2.34. Find PEG and judge valuation.`, a:`PEG = 28.75/14.5 = <b>1.98</b>, below peer median 2.34 → appears <b>undervalued</b> (check peers use leading P/E too, and are similar risk).`},
+  {id:'j4', q:`Party Favors: leading P/E 18.75, growth 15.32%, peer median PEG 0.92. Find PEG and judge valuation.`, a:`PEG = 18.75/15.32 = <b>1.22</b>, above peer median 0.92 → appears <b>overvalued</b>.`},
+  {id:'j5', q:`Name the three drawbacks of the PEG ratio.`, a:`(1) P/E-vs-g relationship is <b>not linear</b>. (2) Still <b>doesn't account for risk</b>. (3) Doesn't reflect the <b>duration of the high-growth period</b> in a multistage model.`},
+],
+k: [
+  {id:'k1', q:`Write the general formula for terminal value using a price multiple.`, a:`terminal value = price multiple × fundamental variable.`},
+  {id:'k2', q:`Name the two methods for estimating the terminal price multiple, and the tradeoff between them.`, a:`(1) <b>Based on fundamentals</b> = justified multiple × fundamental forecast (needs g, r, payout estimates). (2) <b>Based on comparables</b> = benchmark multiple × fundamental forecast (uses market data exclusively, but a mispriced benchmark transfers its error into your terminal value).`},
+  {id:'k3', q:`Write the terminal-value formulas for leading vs. trailing P/E.`, a:`TV in year n = (justified leading P/E) × (forecasted earnings in year n+1). TV in year n = (justified trailing P/E) × (forecasted earnings in year n).`},
+  {id:'k4', q:`Polar Technology: Year 5 EPS forecast C$2.10, Year 6 EPS forecast C$2.32, benchmark trailing P/E 35. Find terminal value in Year 5.`, a:`TV(Year 5) = 35 × C$2.10 (Year 5 EPS, since trailing) = <b>C$73.50</b>. (Year 6 EPS would only be used with a leading-P/E terminal value.)`},
+  {id:'k5', q:`What is the key weakness of the comparables approach to estimating terminal value?`, a:`If the <b>benchmark itself is mispriced</b>, that mispricing transfers directly into your terminal value estimate.`},
+],
+l: [
+  {id:'l1', q:`List the four steps of the method-of-comparables benchmarking process.`, a:`(1) Select/calculate the multiple. (2) Select the benchmark; calculate its mean/median. (3) Compare stock's multiple to benchmark. (4) Check whether any difference is explained by fundamentals; adjust.`},
+  {id:'l2', q:`Name five commonly used P/E benchmarks.`, a:`(1) A similar peer's P/E. (2) Mean/median P/E of the industry peer group. (3) Mean/median P/E for the industry. (4) P/E of an equity index. (5) The stock's own average historical P/E.`},
+  {id:'l3', q:`Allbright: P/E 10.0 vs. peer median 13.3, with comparable growth (11%) and beta (1.3). Basic Designs: P/E 14.0 vs. peer median 13.3, with lower growth (9%) and higher beta (1.4). Judge each.`, a:`<b>Allbright</b>: undervalued — lower P/E despite equal fundamentals. <b>Basic Designs</b>: overvalued — higher P/E despite fundamentals (lower growth, higher risk) that should justify a LOWER P/E.`},
+  {id:'l4', q:`What practical difference applies when using the comparables method for P/B instead of P/E?`, a:`Book-value <b>forecasts</b> are far less available than EPS forecasts, so analysts typically use <b>trailing</b> book value. Must also control for differences in ROE, risk, and growth.`},
+  {id:'l5', q:`What must analysts control for when using the comparables method for P/S?`, a:`<b>Profit margin</b>, expected growth, risk, and the <b>quality of accounting data</b> (P/S is usually based on trailing sales).`},
+  {id:'l6', q:`Define look-ahead bias in the context of backtesting a multiples-based strategy.`, a:`Using information that was <b>not actually available</b> at the historical point in time when the stocks would have been selected.`},
+],
+m: [
+  {id:'m1', q:`A stock's P/E is below the benchmark. Name the three possible explanations.`, a:`(1) The stock is <b>genuinely undervalued</b>. (2) Properly valued, but has <b>lower expected growth</b> than the benchmark. (3) Properly valued, but has <b>higher required return/risk</b> than the benchmark.`},
+  {id:'m2', q:`What condition must hold before you can conclude a stock is "genuinely undervalued" rather than just properly priced with different fundamentals?`, a:`The stock's <b>growth and risk must be comparable</b> to the benchmark's — you must be comparing apples to apples.`},
+  {id:'m3', q:`Crisco (P/B 4.45, P/S 6.60) vs. its industry peers (mean P/B 2.065, mean P/S 3.733). Judge Crisco.`, a:`<b>Overvalued</b> — Crisco's P/B and P/S both exceed peer mean and median.`},
+  {id:'m4', q:`How is EV/EBITDA interpreted using the method of comparables?`, a:`Same logic as other multiples: a <b>lower</b> EV/EBITDA relative to peers indicates relative <b>undervaluation</b>; a higher ratio indicates overvaluation.`},
+  {id:'m5', q:`How is dividend yield interpreted using the method of comparables, and what's the key caveat?`, a:`A <b>high yield relative to the benchmark indicates undervaluation</b>, all else equal — but check whether the gap is really explained by a <b>growth-rate difference</b> instead.`},
+  {id:'m6', q:`In the Crisco/Soothsayer peer-group example, what did the large mean-vs-median gap in each peer group signal?`, a:`The presence of <b>outliers</b> distorting the mean (e.g., Enterprise Software mean P/B 7.866 vs. median only 2.770).`},
+],
+n: [
+  {id:'n1', q:`List the four alternative definitions of cash flow used for P/CF and EV multiples.`, a:`(1) Earnings-plus-noncash-charges (CF). (2) Adjusted cash flow (adjusted CFO). (3) Free cash flow to equity (FCFE). (4) EBITDA.`},
+  {id:'n2', q:`Write the "CF" (earnings-plus-noncash-charges) formula and its limitation.`, a:`CF = net income + depreciation + amortization. <b>Limitation:</b> ignores noncash revenue and changes in net working capital.`},
+  {id:'n3', q:`What's the key US GAAP vs. IFRS difference affecting adjusted CFO comparability?`, a:`US GAAP requires interest paid/received and dividends received to be classified as <b>operating</b> cash flows. IFRS is more flexible: interest paid can be operating OR financing; interest/dividends received can be operating OR investing.`},
+  {id:'n4', q:`Write the FCFE formula and state its key tradeoff as a cash-flow measure.`, a:`FCFE = CFO − FCInv + net borrowing. Theoretically the <b>preferred</b> definition, but <b>more volatile</b> than straight cash flow.`},
+  {id:'n5', q:`Why is EBITDA better suited to enterprise valuation than to equity valuation alone?`, a:`EBITDA is a <b>pretax, pre-interest</b> measure — a flow to <b>both equity and debt</b> holders, so it should be paired with a total-company-value numerator (EV), not just equity value.`},
+  {id:'n6', q:`Write the general P/CF formula.`, a:`P/CF = market price per share / cash flow per share = market value of equity / cash flow.`},
+  {id:'n7', q:`DMS: net income $32M, D&A $41M, 25M shares, price $47/share. Using CF (earnings+noncash charges), find P/CF.`, a:`CF = 32+41 = $73M. Equity value = 25×47 = $1,175M. P/CF = 1,175/73 = <b>16.1×</b>.`},
+  {id:'n8', q:`By convention, do analysts typically use trailing or leading P/CF, and why?`, a:`<b>Trailing</b> — relying on the most recent four quarters of cash flow per share (forward cash-flow forecasts are far less standardized than EPS forecasts).`},
+],
+o: [
+  {id:'o1', q:`Write the enterprise value (EV) formula.`, a:`EV = market value of common stock + market value of preferred equity + market value of debt + minority interest − cash and investments.`},
+  {id:'o2', q:`Why is cash and investments subtracted when calculating EV?`, a:`An acquirer's <b>net</b> price paid for a target would effectively be lowered by the amount of liquid assets acquired along with it.`},
+  {id:'o3', q:`Write the EV/EBITDA formula and the two ways to build EBITDA.`, a:`EV/EBITDA = enterprise value / EBITDA. EBITDA = recurring earnings from continuing ops + interest + taxes + D&A, <em>or for forecasting</em> = EBIT + D&A.`},
+  {id:'o4', q:`Name three situations where EV/EBITDA is especially useful.`, a:`(1) Comparing firms with <b>different financial leverage</b> (more useful than P/E). (2) Valuing <b>capital-intensive</b> businesses with high D&A. (3) EBITDA is <b>usually positive</b> even when EPS is not.`},
+  {id:'o5', q:`Name two drawbacks of EV/EBITDA.`, a:`(1) If working capital is growing, EBITDA <b>overstates CFO</b>; ignores revenue-recognition effects. (2) FCFF captures capex and is more linked to valuation theory — EBITDA is adequate only if <b>capex ≈ depreciation</b>.`},
+  {id:'o6', q:`Boulevard Industries: price Sf22.50 × 40M shares, debt Sf137M, cash Sf62.3M, investments Sf327M, net income Sf137.5M, interest Sf6.9M, D&A Sf10.4M, taxes Sf95.9M. Find EV/EBITDA.`, a:`EBITDA = 137.5+6.9+95.9+10.4 = Sf250.7M. EV = 900+137−62.3−327 = Sf647.7M. EV/EBITDA = 647.7/250.7 = <b>2.6×</b>.`},
+  {id:'o7', q:`Define total invested capital (TIC) and how it differs from EV.`, a:`TIC (market value of invested capital) = market value of equity + debt. Unlike EV, TIC <b>includes</b> cash and short-term investments (not subtracted).`},
+  {id:'o8', q:`What is EV/Sales (EV/S) used for?`, a:`An alternative to P/S, particularly appropriate for comparing companies with <b>significantly different capital structures</b>.`},
+],
+p: [
+  {id:'p1', q:`Name the four broad sources of cross-border valuation comparison differences.`, a:`Differences in <b>accounting methods, cultures, risk, and growth opportunities</b>.`},
+  {id:'p2', q:`Name the six common categories of international accounting differences.`, a:`<b>Goodwill, deferred income taxes, foreign exchange adjustments, R&D, pension expense, and tangible asset revaluations.</b>`},
+  {id:'p3', q:`Which price multiple is LEAST affected by cross-border accounting differences, and why?`, a:`<b>P/FCFE</b> — cash flow is much harder to distort via accounting choices than accrual-based figures.`},
+  {id:'p4', q:`Which multiples are MOST affected by cross-border accounting differences?`, a:`<b>P/B, P/E, P/EBITDA, and EV/EBITDA</b> — all more influenced by management's choice of accounting methods and estimates.`},
+],
+q: [
+  {id:'q1', q:`Define momentum indicators and name the three common types.`, a:`Relate market price or a fundamental (e.g., EPS) to its own historical/expected time series. Types: <b>earnings surprise, standardized unexpected earnings (SUE), relative strength</b>.`},
+  {id:'q2', q:`Write the earnings surprise formula and its economic rationale.`, a:`earnings surprise = reported EPS − expected EPS. Rationale: positive surprises may lead to <b>persistent positive abnormal returns</b>.`},
+  {id:'q3', q:`Write the SUE formula and explain the interpretation nuance.`, a:`SUE = earnings surprise / standard deviation of earnings surprise. A given size of surprise is <b>more meaningful the smaller</b> the stock's typical historical forecast errors.`},
+  {id:'q4', q:`Define relative strength indicators and their economic rationale.`, a:`Compare a stock's price/return performance to its <b>own history</b> or to <b>peer stocks</b>. Rationale: persistence or reversal patterns may exist, possibly depending on the investor's time horizon.`},
+],
+r: [
+  {id:'r1', q:`What is the key insight about a portfolio/index P/E vs. the simple mean of its constituents' P/Es?`, a:`They are <b>NOT equal</b> — the portfolio/index P/E is best calculated as the <b>weighted harmonic mean</b> of the constituent P/Es.`},
+  {id:'r2', q:`Write the weighted harmonic mean formula.`, a:`weighted harmonic mean = 1 / Σ(wᵢ / Xᵢ), where w = weight and X = each P/E.`},
+  {id:'r3', q:`Two stocks: price $10/EPS $1 (P/E 10) and price $16/EPS $2 (P/E 8). What is the TRUE portfolio P/E, and which averaging method matches it exactly?`, a:`True portfolio P/E = (10+16)/(1+2) = 26/3 = <b>8.67×</b>. Only the <b>weighted harmonic mean</b> (price-weighted) exactly equals this.`},
+  {id:'r4', q:`Which measure of central tendency is most distorted by large (high) outliers?`, a:`The <b>arithmetic mean</b>.`},
+  {id:'r5', q:`Which measure of central tendency puts more weight on smaller values, making it most sensitive to small outliers?`, a:`The <b>harmonic mean</b>.`},
+  {id:'r6', q:`For an equally weighted portfolio, how do the harmonic mean and weighted harmonic mean compare?`, a:`They are <b>equal</b> — weights only matter when they differ across constituents.`},
+],
+};
+
+const QUIZ = [
+{id:'q1', section:'a', q:`Consumer Products, Inc., has a trailing P/E of 27.52, while the median peer group P/E is 33.25. Assuming no differences in fundamentals between Consumer Products and its peers, it is most likely that the stock:`,
+ opts:[`should be sold short`,`appears to be overvalued`,`appears to be undervalued`], correct:2,
+ exp:`Consumer Products' trailing P/E (27.52) is below the peer median (33.25) with no fundamental differences assumed, so by the method of comparables the stock appears undervalued.`},
+
+{id:'q2', section:'a', q:`At the end of 20X3, an analyst estimates the value of Copyright, Inc. common stock at $84/share using a two-stage DDM (H-model), and forecasts 20X4 earnings of $4.20/share. Copyright is most likely:`,
+ opts:[`underpriced if its actual leading P/E is 15.0×`,`underpriced if its actual leading P/E is 23.0×`,`overpriced if its actual leading P/E is 16.6×`], correct:0,
+ exp:`Justified leading P/E = $84/$4.20 = 20×. An actual leading P/E of 15.0× is below the justified 20× → underpriced. (23.0× would be overpriced, not underpriced; 16.6× would be underpriced, not overpriced — both distractors reverse the comparison.)`},
+
+{id:'q3', section:'b', q:`A stock's actual P/B ratio equals its justified P/B ratio calculated from the Gordon growth model. This stock is most likely:`,
+ opts:[`undervalued`,`overvalued`,`fairly valued`], correct:2,
+ exp:`By definition, when the actual multiple equals the justified (fair-value) multiple, the stock is fairly valued — neither over- nor undervalued.`},
+
+{id:'q4', section:'c', q:`Which of the following is best described as a rationale (not a drawback) for using the P/B ratio in valuation?`,
+ opts:[`Book value does not reflect the value of intangible assets such as human capital`,`Book value is an appropriate measure of net asset value for finance, investment, insurance, and banking firms`,`Different accounting conventions across firms reduce comparability`], correct:1,
+ exp:`Book value being an appropriate net-asset measure for liquid-asset firms (finance/investment/insurance/banking) is a rationale FOR using P/B. The other two options are drawbacks of P/B.`},
+
+{id:'q5', section:'c', q:`The two drawbacks of the P/CF ratio both relate to:`,
+ opts:[`the choice of discount rate`,`the definition of cash flow used`,`the firm's dividend policy`], correct:1,
+ exp:`Both P/CF drawbacks trace to the cash-flow definition: "earnings-plus-noncash-charges" ignores noncash revenue and working-capital changes, and FCFE (theoretically preferred) is more volatile than straight cash flow.`},
+
+{id:'q6', section:'d', q:`A stock trades at $60. Its most recent quarterly dividend was $0.45, and the next four quarters are forecast to pay $0.45, $0.48, $0.50, $0.52. The trailing and leading dividend yields are closest to:`,
+ opts:[`3.0% trailing, 3.25% leading`,`3.0% trailing, 3.0% leading`,`2.6% trailing, 3.25% leading`], correct:0,
+ exp:`Trailing D/P = (4×$0.45)/$60 = $1.80/$60 = 3.0%. Leading D/P = ($0.45+$0.48+$0.50+$0.52)/$60 = $1.95/$60 = 3.25%.`},
+
+{id:'q7', section:'e', q:`The 12-month trailing EPS for Sample Fabrication as of 12/31/20X3 is $1.29 (stock trades at $42.50). Q1: extraordinary loss $0.22/share. Q3: inventory write-down loss $0.04/share. Q4: gain of $0.08/share from a change in accounting estimate. Sample's trailing P/E based on underlying earnings is closest to:`,
+ opts:[`24.6`,`28.9`,`32.9`], correct:1,
+ exp:`Underlying earnings = $1.29 + $0.22 + $0.04 − $0.08 = $1.47 (add back losses, subtract the gain). Trailing P/E = $42.50/$1.47 = 28.9×.`},
+
+{id:'q8', section:'e', q:`The average ROE for Lever, Inc., over the last business cycle was 32%. Current book value per share is $14. (Next year's EPS forecast of $5, 30% payout ratio, and $54 market price are also given but not needed here.) Lever's normalized earnings per share are closest to:`,
+ opts:[`$4.48`,`$5.00`,`$5.26`], correct:0,
+ exp:`Method of average ROE: normalized EPS = average ROE × current BVPS = 0.32 × $14 = $4.48. The EPS forecast, payout ratio, and market price are distractors not used in this method.`},
+
+{id:'q9', section:'f', q:`Firm A has EPS of −$0.50 and Firm B has EPS of $0.10, both trading at $20/share. Which statement is most accurate?`,
+ opts:[`Neither firm's E/P ratio is meaningful because one EPS is negative`,`Firm B has the higher (more attractive) E/P, and E/P remains meaningful for both firms despite Firm A's loss`,`P/E should be used instead of E/P since it is easier to interpret when EPS is negative`], correct:1,
+ exp:`E/P = EPS/Price is always computable and meaningful since price is never negative — Firm A: −0.50/20 = −2.5%; Firm B: 0.10/20 = 0.5%. Firm B ranks as relatively cheaper (higher E/P). P/E would be meaningless or misleading for Firm A (negative P/E).`},
+
+{id:'q10', section:'g', q:`Which of the following investment strategies is most consistent with choosing high dividend-yield stocks?`,
+ opts:[`Growth`,`Momentum`,`Value`], correct:2,
+ exp:`Dividend yield is positively related to the required rate of return and negatively related to the forecasted dividend growth rate. High-yield stocks therefore tend to be lower-growth, higher-required-return stocks — a value, not a growth, orientation.`},
+
+{id:'q11', section:'g', q:`All else equal, a wider spread between a firm's ROE and its required return (r) results in:`,
+ opts:[`a higher justified P/B ratio`,`a lower justified P/B ratio`,`no effect on the justified P/B ratio`], correct:0,
+ exp:`Justified P/B = (ROE−g)/(r−g). The larger the spread between ROE and r, all else equal, the higher the P/B — the firm is creating more value per dollar of required return.`},
+
+{id:'q12', section:'h', q:`An analyst is valuing an electric utility with payout ratio 0.65, beta 0.56, and expected earnings growth 0.032. A peer regression gives: predicted P/E = 8.57 + (5.38×payout) + (15.53×growth) − (0.61×beta). The predicted P/E is closest to:`,
+ opts:[`12.2`,`15.4`,`20.8`], correct:0,
+ exp:`Predicted P/E = 8.57 + (5.38×0.65) + (15.53×0.032) − (0.61×0.56) = 8.57+3.497+0.497−0.342 = 12.2.`},
+
+{id:'q13', section:'i', q:`Blue Ridge Camping: payout ratio 75%, ROE 18%, EPS $5.35, sales per share $342, expected growth 4.5%, required return 15%. The firm's justified P/S multiple is closest to:`,
+ opts:[`0.0780`,`0.1114`,`0.1164`], correct:2,
+ exp:`Profit margin = 5.35/342 = 0.0156. Justified P/S = 0.0156×0.75×1.045/(0.15−0.045) = 0.0156×0.75×1.045/0.105 = 0.1164.`},
+
+{id:'q14', section:'i', q:`Western Graphics paid a dividend of $0.40/share last year on EPS of $1.00. Earnings and dividends are expected to grow at 5%/year forever; required return is 12%. The justified trailing and leading P/E multiples are closest to:`,
+ opts:[`6.0 trailing, 5.7 leading`,`5.7 trailing, 6.0 leading`,`7.0 trailing, 6.3 leading`], correct:0,
+ exp:`Payout = 0.40/1.00 = 40%. Trailing P/E = (0.40×1.05)/(0.12−0.05) = 0.42/0.07 = 6.0×. Leading P/E = 0.40/0.07 = 5.7×.`},
+
+{id:'q15', section:'i', q:`Creative Toys recently paid a dividend of $1.35/share, has a payout ratio of 67%, ROE of 23%, and expected growth of 7.6%. Required return is 14%. The justified P/B multiple is closest to:`,
+ opts:[`1.22`,`1.19`,`2.41`], correct:2,
+ exp:`Justified P/B = (ROE−g)/(r−g) = (0.23−0.076)/(0.14−0.076) = 0.154/0.064 = 2.41. (Note: g = ROE×retention = 0.23×0.33 = 0.076, consistent with the given 7.6% growth rate — a useful cross-check.)`},
+
+{id:'q16', section:'i', q:`A firm has a justified price-to-sales ratio of 2.0×, a net profit margin of 5%, and a long-term growth rate of 4%. Using the shortcut justified P/S = net profit margin × justified trailing P/E, the justified leading P/E (Gordon growth model) is closest to:`,
+ opts:[`34.8`,`38.5`,`40.0`], correct:1,
+ exp:`Justified trailing P/E = P/S / net profit margin = 2.0/0.05 = 40.0×. Justified leading P/E = trailing P/E/(1+g) = 40.0/1.04 = 38.5×.`},
+
+{id:'q17', section:'j', q:`Party Favors, Inc., has a leading P/E of 18.75 and a 5-year consensus growth forecast of 15.32%. The median PEG (leading-P/E basis) for comparable-risk peers is 0.92. The stock appears to be:`,
+ opts:[`overvalued because its PEG ratio is 0.82`,`overvalued because its PEG ratio is 1.22`,`undervalued because its PEG ratio is 0.82`], correct:1,
+ exp:`PEG = 18.75/15.32 = 1.22, which exceeds the peer median of 0.92 → the stock appears overvalued (paying more P/E per unit of growth than peers).`},
+
+{id:'q18', section:'j', q:`Two stocks have identical PEG ratios. An analyst should NOT automatically conclude they are equally attractive because the PEG ratio fails to account for which factor?`,
+ opts:[`differences in risk between the two stocks`,`differences in trailing vs. leading P/E basis only`,`differences in dividend payout ratio only`], correct:0,
+ exp:`PEG's valuation rule ("lower PEG = more attractive") only holds when comparing stocks of similar risk — the ratio itself does not adjust for risk differences. It also doesn't reflect the duration of the high-growth period or the (nonlinear) true relationship between P/E and g.`},
+
+{id:'q19', section:'k', q:`An analyst forecasts Year 4 EPS of $3.00 and Year 5 EPS of $3.30 for a firm, with a benchmark trailing industry P/E of 18. The terminal value at the end of Year 4, based on this trailing multiple, is closest to:`,
+ opts:[`$54.00`,`$59.40`,`$46.20`], correct:0,
+ exp:`Terminal value (Year 4) using a trailing P/E must be paired with Year 4 (not Year 5) EPS: 18 × $3.00 = $54.00. Using Year 5 EPS ($3.30) would be the mistake of pairing a trailing multiple with a leading-period earnings figure.`},
+
+{id:'q20', section:'l', q:`Pfeiffer (Medical-Drugs industry): P/B 9.688, P/S 5.971, vs. peer mean P/B 5.622/median 4.250, mean P/S 8.708/median 4.530. Mapps (Applications Software): P/B 4.524, P/S 8.578, vs. peer mean P/B 4.100/median 2.140, mean P/S 3.420/median 1.440. Which statement is most accurate?`,
+ opts:[`Both stocks are relatively overvalued`,`Both stocks are relatively undervalued`,`One is overvalued and the other undervalued`], correct:0,
+ exp:`Pfeiffer's P/B (9.688) and P/S (5.971) both exceed their peer group's mean and median. Mapps's P/B (4.524) and P/S (8.578) also both exceed its peer group's mean and median. Both stocks appear relatively overvalued.`},
+
+{id:'q21', section:'l', q:`Home Decor: P/CF 20.88, P/FCFE 28.69. Lester's: P/CF 23.90, P/FCFE 132.78. Home Decor has a materially higher expected growth rate than Lester's. Based on this comparison, which is more likely undervalued?`,
+ opts:[`Lester's, because its P/FCFE is much higher`,`Home Decor, because its multiples are lower despite higher expected growth`,`Neither — the two firms are not comparable`], correct:1,
+ exp:`Home Decor's P/CF (20.88, 87.4% of Lester's) and especially its P/FCFE (28.69, only 21.6% of Lester's) are both lower than Lester's — despite Home Decor having the higher expected growth, which should normally justify a HIGHER multiple. This makes Home Decor look undervalued relative to Lester's.`},
+
+{id:'q22', section:'l', q:`Home Decor trades at a P/B that is 91% of its industry average, with a forecasted ROE equal to the industry average. Lester's trades at a P/B that is 119% of the same industry average, with a forecasted ROE slightly below the industry average. Which statement LEAST LIKELY supports recommending Home Decor over Lester's?`,
+ opts:[`Home Decor's P/B ratio relative to the industry`,`Home Decor's P/B ratio relative to Lester's P/B ratio`,`Home Decor's own historical (multi-year) P/B ratios`], correct:2,
+ exp:`Home Decor's historical P/B trend by itself doesn't speak to its valuation relative to Lester's or the industry today — it's the current cross-sectional comparisons (vs. industry, vs. Lester's) that support the recommendation, not the firm's own P/B history.`},
+
+{id:'q23', section:'l', q:`Harmon's P/B is 57% of its industry average (ROE close to industry) and 50% of Wally's current P/B (ROE just slightly below Wally's); Harmon's and Wally's betas are only slightly different. Which is LEAST LIKELY a justification for preferring Harmon's over Wally's?`,
+ opts:[`Harmon's level of systematic risk (beta) relative to Wally's`,`Harmon's P/B ratio relative to the industry`,`Wally's P/B ratio relative to the industry`], correct:0,
+ exp:`Since the two firms' betas are only slightly different, relative systematic risk doesn't meaningfully support (or refute) the choice — it's a weak/neutral factor here. The P/B-vs-industry comparisons for each firm are what actually drive the undervalued/overvalued conclusions.`},
+
+{id:'m1', section:'m', q:`An analyst finds Firm X's P/E is well below its industry benchmark. Before concluding Firm X is undervalued, the analyst should confirm that:`,
+ opts:[`Firm X pays a higher dividend than the benchmark`,`Firm X has growth and risk comparable to the benchmark`,`Firm X uses IFRS rather than US GAAP`], correct:1,
+ exp:`A low P/E relative to a benchmark could reflect genuine undervaluation, OR simply lower expected growth, OR higher required return/risk than the benchmark. Only if growth and risk are truly comparable can "undervalued" be concluded with confidence.`},
+
+{id:'m2', section:'m', q:`Firm A's EV/EBITDA of 6.0× is below its peer group's mean of 8.5×, with comparable growth and leverage. This most likely indicates Firm A is:`,
+ opts:[`overvalued relative to peers`,`undervalued relative to peers`,`impossible to assess without net income data`], correct:1,
+ exp:`Same logic as P/E, P/B, P/S: a lower EV/EBITDA relative to comparable peers indicates relative undervaluation, all else (growth, leverage/risk) being equal.`},
+
+{id:'q24', section:'n', q:`Clementi wants Fischer to calculate P/CF for Lester's using earnings-plus-noncash-charges, given net income $1,023,262,000, depreciation $534,102,000, 631,643,000 basic shares, and a price of $42.10. The P/CF is closest to:`,
+ opts:[`15.89`,`17.08`,`25.99`], correct:1,
+ exp:`CF = $1,023,262,000 + $534,102,000 = $1,557,364,000. CF/share = 1,557,364,000/631,643,000 = $2.4656. P/CF = $42.10/$2.4656 = 17.08×.`},
+
+{id:'q25', section:'n', q:`Continuing the Lester's example: reported CFO is $1,497,442,000, and the income statement shows a $139,870,000 nonrecurring expense; the marginal tax rate is 37%. The adjusted P/CFO (price $42.10, 631,643,000 shares) is closest to:`,
+ opts:[`15`,`17`,`19`], correct:1,
+ exp:`Adjusted CFO = $1,497,442,000 + $139,870,000×(1−0.37) = $1,585,560,100. Adjusted CFO/share = $2.51. Adjusted P/CFO = $42.10/$2.51 = 16.77 ≈ 17.`},
+
+{id:'q26', section:'n', q:`Comparing CFO-based multiples for a US-GAAP-reporting firm and an IFRS-reporting firm, an analyst should be most cautious about which classification difference?`,
+ opts:[`revenue recognition timing only`,`treatment of interest paid/received and dividends received, which US GAAP always classifies as operating but IFRS may classify as financing or investing`, `depreciation method used only`], correct:1,
+ exp:`US GAAP requires interest paid, interest received, and dividends received to be classified as operating cash flows. IFRS is more flexible — interest paid may be operating or financing, and interest/dividends received may be operating or investing — so CFO is not directly comparable across the two standards without adjustment.`},
+
+{id:'q27', section:'o', q:`Carolina Steel: share price $31.25, 30M shares, debt $115M, cash $47.6M, investments $247M, net income $119.4M, interest $5.8M, D&A ($6.9M+$2.3M), taxes $85.9M. The EV/EBITDA ratio is closest to:`,
+ opts:[`3.44`,`4.26`,`4.78`], correct:0,
+ exp:`EBITDA = 119.4+5.8+85.9+6.9+2.3 = $220.3M. EV = (31.25×30)+115−47.6−247 = $757.9M. EV/EBITDA = 757.9/220.3 = 3.44×.`},
+
+{id:'q28', section:'o', q:`A company's market value of equity is $500M and market value of debt is $150M, with $40M cash and no preferred stock or minority interest. Its total invested capital (TIC) is closest to:`,
+ opts:[`$610M`,`$650M`,`$690M`], correct:1,
+ exp:`TIC = market value of equity + debt = $500M+$150M = $650M. Unlike enterprise value (which would subtract the $40M cash, giving $610M), TIC includes cash and short-term investments.`},
+
+{id:'q29', section:'p', q:`When comparing valuation multiples across two firms in different countries with different accounting standards, which multiple is generally LEAST affected by the accounting differences?`,
+ opts:[`P/B`,`P/FCFE`,`EV/EBITDA`], correct:1,
+ exp:`P/FCFE is least affected because cash flow is much harder to distort via accounting choices than accrual-based figures like book value or EBITDA. P/B, P/E, P/EBITDA, and EV/EBITDA are all more seriously affected.`},
+
+{id:'q30', section:'q', q:`Stock A has an earnings surprise of $0.10 and a historical standard deviation of earnings surprises of $0.02 (SUE = 5.0). Stock B has an earnings surprise of $0.10 and a historical standard deviation of $0.20 (SUE = 0.5). Which stock's surprise is more economically meaningful?`,
+ opts:[`Stock A, because the same-size surprise is large relative to its typical historical forecast errors`,`Stock B, because its raw earnings surprise dollar amount is identical to Stock A's`,`They are equally meaningful since the raw earnings surprise is the same`], correct:0,
+ exp:`Standardized unexpected earnings scales the surprise by its own historical volatility. A given size of surprise is more meaningful the smaller the stock's typical historical forecast errors — Stock A's SUE of 5.0 signals a much more unusual, meaningful surprise than Stock B's SUE of 0.5.`},
+
+{id:'q31', section:'r', q:`Three stocks: Stock 1 price $20/EPS $2 (P/E=10); Stock 2 price $30/EPS $3 (P/E=10); Stock 3 price $50/EPS $2 (P/E=25). A portfolio holds one share of each. The TRUE portfolio P/E (total price / total earnings) is closest to:`,
+ opts:[`15.0`,`14.3`,`16.7`], correct:1,
+ exp:`Total price = 20+30+50 = 100. Total earnings = 2+3+2 = 7. True portfolio P/E = 100/7 = 14.3×. (Note this differs from the simple arithmetic mean of the three P/Es, which would be (10+10+25)/3 = 15.0 — a common trap. Only the weighted harmonic mean, price-weighted, will exactly equal 14.3.)`},
+];
+
+const PRACTICE = [
+{id:'p1', tag:'LOS 20.d', title:'P/E Ratio — Byron Investments',
+ scenario:`An analyst gathers the following on Byron Investments: current share price €18.00, current-year net income €32,000,000, 40,000,000 shares outstanding, and forecasted net income next year of €44,000,000 (same share count). Calculate the trailing and leading P/E ratios.`,
+ steps:[
+  `Compute current-year EPS: EPS = net income / shares = €32,000,000 / 40,000,000 = <b>€0.80</b>.`,
+  `Compute trailing P/E: trailing P/E = price / current EPS = €18.00 / €0.80 = <b>22.5×</b>.`,
+  `Compute forecasted EPS next year: €44,000,000 / 40,000,000 = <b>€1.00</b>.`,
+  `Compute leading P/E: leading P/E = price / forecasted EPS = €18.00 / €1.00 = <b>18.0×</b>.`
+ ], final:`Trailing P/E = 22.5×; Leading P/E = 18.0×.`},
+
+{id:'p2', tag:'LOS 20.d', title:'P/B and P/S — Crisco Systems vs. Soothsayer Corp.',
+ scenario:`<div class="table-scroll"><table class="mini"><tr><th>Company</th><th>Book Value of Equity ($M)</th><th>Sales ($M)</th><th>Shares (M)</th><th>Price</th></tr>
+ <tr><td>Crisco Systems</td><td>$28,039</td><td>$18,878</td><td>7,001</td><td>$17.83</td></tr>
+ <tr><td>Soothsayer Corp.</td><td>$6,320</td><td>$9,475</td><td>5,233</td><td>$12.15</td></tr></table></div>
+ Calculate the P/B and P/S ratios for both companies.`,
+ steps:[
+  `Crisco book value per share = $28,039M / 7,001M = <b>$4.01</b>. Crisco P/B = $17.83 / $4.01 = <b>4.45×</b>.`,
+  `Soothsayer book value per share = $6,320M / 5,233M = <b>$1.21</b>. Soothsayer P/B = $12.15 / $1.21 = <b>10.04×</b>.`,
+  `Crisco sales per share = $18,878M / 7,001M = <b>$2.70</b>. Crisco P/S = $17.83 / $2.70 = <b>6.60×</b>.`,
+  `Soothsayer sales per share = $9,475M / 5,233M = <b>$1.81</b>. Soothsayer P/S = $12.15 / $1.81 = <b>6.71×</b>.`
+ ], final:`Crisco: P/B = 4.45×, P/S = 6.60×. Soothsayer: P/B = 10.04×, P/S = 6.71×.`},
+
+{id:'p3', tag:'LOS 20.d', title:'Dividend Yield — OnePrice, Inc.',
+ scenario:`OnePrice Inc. trades at $47.50. The most recent quarterly dividend was $0.50. The next four quarters are forecast to pay $0.50, $0.55, $0.60, and $0.65. Calculate the trailing and leading dividend yields.`,
+ steps:[
+  `Trailing D/P uses 4 × the most recent quarterly dividend: 4 × $0.50 = $2.00.`,
+  `Trailing D/P = $2.00 / $47.50 = <b>4.2%</b>.`,
+  `Leading D/P uses the sum of the next 4 forecasted quarterly dividends: $0.50+$0.55+$0.60+$0.65 = $2.30.`,
+  `Leading D/P = $2.30 / $47.50 = <b>4.8%</b>.`
+ ], final:`Trailing D/P = 4.2%; Leading D/P = 4.8%.`},
+
+{id:'p4', tag:'LOS 20.e', title:'Underlying Earnings — Magnolia Enterprises',
+ scenario:`Magnolia's trailing four quarters of reported diluted EPS: Dec 2021 C$1.45, Mar 2022 C$1.30, Jun 2022 C$1.40, Sep 2022 C$1.35 (stock price at Sep 2022 = C$44.85). During the year, Mar 2022 included a C$0.30/share nonrecurring gain on asset sales, and Jun 2022 included a C$0.55/share nonrecurring extraordinary expense. Calculate underlying earnings and the trailing P/E based on underlying earnings.`,
+ steps:[
+  `Sum the 4 quarters of reported EPS: 1.45+1.30+1.40+1.35 = <b>C$5.50</b> (12-month reported EPS).`,
+  `Remove the nonrecurring GAIN (it inflated earnings, so subtract): 5.50 − 0.30 = 5.20.`,
+  `Add back the nonrecurring EXPENSE (it depressed earnings, so add): 5.20 + 0.55 = <b>C$5.75</b> underlying earnings.`,
+  `Trailing P/E on underlying earnings = C$44.85 / C$5.75 = <b>7.80×</b>.`
+ ], final:`Underlying earnings = C$5.75; trailing P/E (underlying) = 7.80×.`},
+
+{id:'p5', tag:'LOS 20.e', title:'Normalized Earnings — Magnolia Enterprises',
+ scenario:`<div class="table-scroll"><table class="mini"><tr><th>Year</th><th>20X1</th><th>20X2</th><th>20X3</th><th>20X4</th></tr>
+ <tr><td>EPS</td><td>C$4.20</td><td>C$3.75</td><td>C$4.75</td><td>C$4.30</td></tr>
+ <tr><td>BVPS</td><td>C$26.02</td><td>C$27.78</td><td>C$29.25</td><td>C$32.29</td></tr>
+ <tr><td>ROE</td><td>14.0%</td><td>12.0%</td><td>16.0%</td><td>14.0%</td></tr></table></div>
+ Calculate normalized EPS using both (1) the method of historical average EPS and (2) the method of average ROE.`,
+ steps:[
+  `Method 1 — historical average EPS: (4.20+3.75+4.75+4.30)/4 = <b>C$4.25</b>.`,
+  `Method 2, step A — average ROE: (0.14+0.12+0.16+0.14)/4 = <b>14.00%</b>.`,
+  `Method 2, step B — normalized EPS = average ROE × <u>current</u> (20X4) BVPS = 0.14 × C$32.29 = <b>C$4.52</b>.`
+ ], final:`Historical-average-EPS method = C$4.25. Average-ROE method (preferred) = C$4.52.`},
+
+{id:'p6', tag:'LOS 20.h', title:'Predicted P/E — Public Utility Regression',
+ scenario:`An analyst is valuing a public utility with dividend payout ratio 0.50, beta 0.95, and expected earnings growth 0.06. A regression on peer utilities gives: predicted P/E = 6.75 + (4.00 × payout) + (12.35 × growth) − (0.5 × beta). The utility's actual P/E is 12.0. Calculate the predicted P/E and determine whether the stock is over- or underpriced.`,
+ steps:[
+  `Plug in the payout term: 4.00 × 0.50 = 2.00.`,
+  `Plug in the growth term: 12.35 × 0.06 = 0.741.`,
+  `Plug in the beta term: 0.5 × 0.95 = 0.475.`,
+  `Sum: predicted P/E = 6.75 + 2.00 + 0.741 − 0.475 = <b>9.02</b>.`,
+  `Compare: actual P/E (12.0) &gt; predicted P/E (9.02) → the stock is <b>overpriced</b>.`
+ ], final:`Predicted P/E = 9.02; actual P/E (12.0) exceeds it → overpriced.`},
+
+{id:'p7', tag:'LOS 20.i', title:'Justified P/E — Comtronics (three routes, same answer)',
+ scenario:`Comtronics shares sell for $30. Mean forecast EPS for next year is $4.00, long-run growth is 5%, payout ratio is 60%, required return is 14%. Verify that the "long way" (full Gordon growth valuation) and the "short way" (direct justified-P/E formula) give the same answer, then judge valuation.`,
+ steps:[
+  `Long way — find fundamental value: V₀ = D₁/(r−g) = (0.60×4.00)/(0.14−0.05) = 2.40/0.09 = <b>$26.67</b>.`,
+  `Long way — convert to a multiple: justified leading P/E = $26.67/$4.00 = <b>6.67×</b>.`,
+  `Short way — direct formula: justified leading P/E = (1−b)/(r−g) = 0.40/0.09 = <b>6.67×</b> (same answer).`,
+  `Compare to actual: actual leading P/E = $30/$4.00 = 7.5×. Since 7.5× &gt; 6.67×, Comtronics is <b>overvalued</b>.`
+ ], final:`Justified leading P/E = 6.67× (both methods agree); actual 7.5× → overvalued.`},
+
+{id:'p8', tag:'LOS 20.i', title:'Justified P/E — Generic Fundamentals Problem',
+ scenario:`A stock has a payout ratio of 40%. Shareholders require a return of 11%, and the expected growth rate in dividends is 5%. Calculate the trailing and leading P/E multiples based on these forecasted fundamentals, and verify the trailing/leading relationship.`,
+ steps:[
+  `Justified trailing P/E = (1−b)×(1+g)/(r−g) = 0.40×1.05/(0.11−0.05) = 0.42/0.06 = <b>7.00×</b>.`,
+  `Justified leading P/E = (1−b)/(r−g) = 0.40/0.06 = <b>6.67×</b>.`,
+  `Cross-check: trailing should equal leading × (1+g): 6.67 × 1.05 = 7.00 ✓.`
+ ], final:`Justified trailing P/E = 7.00×; justified leading P/E = 6.67×.`},
+
+{id:'p9', tag:'LOS 20.i', title:'Justified P/B — Generic Fundamentals Problem',
+ scenario:`A firm's ROE is 14%, its required rate of return is 8%, and its expected growth rate is 4%. Calculate the firm's justified P/B based on these fundamentals.`,
+ steps:[
+  `Write the formula: justified P/B = (ROE−g)/(r−g).`,
+  `Plug in values: (0.14−0.04)/(0.08−0.04) = 0.10/0.04.`,
+  `Solve: justified P/B = <b>2.5×</b>.`
+ ], final:`Justified P/B = 2.5×.`},
+
+{id:'p10', tag:'LOS 20.i', title:'Justified P/S — Generic Fundamentals Problem',
+ scenario:`A stock has a dividend payout ratio of 40%, ROE of 8.3%, EPS of $4.25, sales per share of $218.75, and an expected growth rate in dividends and earnings of 5%. Shareholders require a 10% return. Calculate the justified P/S multiple.`,
+ steps:[
+  `Compute net profit margin: E₀/S₀ = $4.25/$218.75 = <b>0.0194</b> (1.94%).`,
+  `Write the formula: justified P/S = (E₀/S₀) × (1−b) × (1+g) / (r−g).`,
+  `Plug in: 0.0194 × 0.40 × 1.05 / (0.10−0.05) = 0.0194×0.40×1.05/0.05.`,
+  `Solve: justified P/S = <b>0.163×</b>.`
+ ], final:`Justified P/S = 0.163×.`},
+
+{id:'p11', tag:'LOS 20.j', title:'PEG Ratio — Med-Ready, Inc.',
+ scenario:`Med-Ready, Inc. has a leading P/E of 28.75 and a 5-year consensus growth rate forecast of 14.5%. The median PEG for a comparable-risk peer group is 2.34. Calculate the firm's PEG and judge its valuation.`,
+ steps:[
+  `Write the formula: PEG = (P/E)/g, using g as a whole number.`,
+  `Plug in: PEG = 28.75/14.5 = <b>1.98</b>.`,
+  `Compare to the peer median: 1.98 &lt; 2.34 → Med-Ready appears <b>undervalued</b>.`,
+  `Caveat to note: confirm the peer PEGs are also computed on a leading-P/E basis and that the peer firms are truly comparable in risk before relying on this conclusion.`
+ ], final:`Med-Ready PEG = 1.98, below the peer median of 2.34 → appears undervalued.`},
+
+{id:'p12', tag:'LOS 20.k', title:'Terminal Value with a Price Multiple — Polar Technology',
+ scenario:`An analyst estimates Polar Technology's EPS in Year 5 to be C$2.10 and in Year 6 to be C$2.32. The median trailing industry P/E is 35. Calculate the terminal value in Year 5.`,
+ steps:[
+  `Identify which multiple you have: a <b>trailing</b> P/E benchmark (35×).`,
+  `A trailing P/E must be paired with the SAME period's earnings — Year 5 EPS (C$2.10), not Year 6.`,
+  `Terminal value (Year 5) = benchmark trailing P/E × Year 5 EPS = 35 × C$2.10 = <b>C$73.50</b>.`
+ ], final:`Terminal value in Year 5 = C$73.50. (Year 6 EPS of C$2.32 would only be used together with a leading P/E multiple.)`},
+
+{id:'p13', tag:'LOS 20.d / 20.n', title:'P/CF Ratio — Data Management Systems (DMS)',
+ scenario:`DMS reported net income of $32 million, D&A of $41 million, net interest expense of $12 million, and CFO of $44 million. Tax rate is 30%. DMS has 25 million shares outstanding, trading at $47/share. Calculate P/CF using earnings-plus-noncash-charges (CF) as the cash-flow proxy.`,
+ steps:[
+  `Compute CF (earnings-plus-noncash-charges): CF = net income + D&amp;A = $32M + $41M = <b>$73M</b>.`,
+  `Note: net interest expense and the tax rate are NOT part of this CF definition — they're distractors here.`,
+  `Compute market value of equity: 25M shares × $47 = <b>$1,175M</b>.`,
+  `Compute P/CF: $1,175M / $73M = <b>16.1×</b>.`
+ ], final:`P/CF (using CF proxy) = 16.1×.`},
+
+{id:'p14', tag:'LOS 20.o', title:'EV/EBITDA — Boulevard Industries',
+ scenario:`<div class="table-scroll"><table class="mini"><tr><td>Recent share price</td><td>Sf 22.50</td></tr><tr><td>Shares outstanding</td><td>40 million</td></tr><tr><td>Market value of debt</td><td>Sf 137 million</td></tr><tr><td>Cash &amp; marketable securities</td><td>Sf 62.3 million</td></tr><tr><td>Investments</td><td>Sf 327 million</td></tr><tr><td>Net income</td><td>Sf 137.5 million</td></tr><tr><td>Interest expense</td><td>Sf 6.9 million</td></tr><tr><td>D&amp;A</td><td>Sf 10.4 million</td></tr><tr><td>Taxes</td><td>Sf 95.9 million</td></tr></table></div>
+ Calculate the EV/EBITDA ratio for Boulevard Industries.`,
+ steps:[
+  `Compute EBITDA: net income + interest + taxes + D&amp;A = 137.5+6.9+95.9+10.4 = <b>Sf 250.7M</b>.`,
+  `Compute market value of equity: 22.50 × 40 = Sf 900M.`,
+  `Compute EV: 900 + 137 (debt) − 62.3 (cash) − 327 (investments) = <b>Sf 647.7M</b>.`,
+  `Compute EV/EBITDA: 647.7/250.7 = <b>2.6×</b>.`
+ ], final:`EV/EBITDA = 2.6×.`},
+
+{id:'p15', tag:'LOS 20.l / 20.m', title:'Method of Comparables (P/E) — Allbright Interiors vs. Basic Designs',
+ scenario:`<div class="table-scroll"><table class="mini"><tr><th></th><th>Trailing P/E</th><th>Leading P/E</th><th>5-yr growth</th><th>Beta</th></tr>
+ <tr><td>Allbright</td><td>10.0</td><td>8.7</td><td>11.0%</td><td>1.3</td></tr>
+ <tr><td>Basic Designs</td><td>14.0</td><td>12.7</td><td>9.0%</td><td>1.4</td></tr>
+ <tr><td>Peer median</td><td>13.3</td><td>12.1</td><td>11.0%</td><td>1.3</td></tr></table></div>
+ Evaluate each stock's valuation using the method of comparables.`,
+ steps:[
+  `Compare Allbright's P/E to the peer median: 10.0 vs. 13.3 → below the benchmark.`,
+  `Check Allbright's fundamentals vs. the benchmark: growth 11.0% (= peer 11.0%), beta 1.3 (= peer 1.3) — <b>comparable</b> fundamentals.`,
+  `Conclude on Allbright: lower P/E with equal fundamentals → genuinely <b>undervalued</b>.`,
+  `Compare Basic Designs's P/E to the peer median: 14.0 vs. 13.3 → above the benchmark.`,
+  `Check Basic Designs's fundamentals: growth 9.0% (LOWER than peer 11.0%, which alone justifies a lower P/E) and beta 1.4 (HIGHER risk than peer 1.3, which also justifies a lower P/E) — yet its P/E is higher, not lower.`,
+  `Conclude on Basic Designs: higher P/E despite fundamentals that should push P/E DOWN → <b>overvalued</b>.`
+ ], final:`Allbright: undervalued. Basic Designs: overvalued.`},
+
+{id:'p16', tag:'LOS 20.l / 20.m', title:'Method of Comparables (P/B & P/S) — Crisco & Soothsayer vs. Industry',
+ scenario:`Recall Crisco's P/B = 4.45, P/S = 6.60 (Networking Products industry). Soothsayer's P/B = 10.04, P/S = 6.71 (Enterprise Software/Services industry).
+ <div class="table-scroll"><table class="mini"><tr><th>Peer Group</th><th>Mean P/B</th><th>Median P/B</th><th>Mean P/S</th><th>Median P/S</th></tr>
+ <tr><td>Networking Products</td><td>2.065</td><td>1.170</td><td>3.733</td><td>0.900</td></tr>
+ <tr><td>Enterprise Software/Services</td><td>7.866</td><td>2.770</td><td>3.341</td><td>1.920</td></tr></table></div>
+ Determine whether each stock is overvalued or undervalued relative to its peer group.`,
+ steps:[
+  `Compare Crisco's P/B (4.45) to its peer group: exceeds both mean (2.065) and median (1.170).`,
+  `Compare Crisco's P/S (6.60) to its peer group: exceeds both mean (3.733) and median (0.900).`,
+  `Conclude on Crisco: both ratios exceed the benchmark on both measures → <b>overvalued</b>.`,
+  `Compare Soothsayer's P/B (10.04) to its peer group: exceeds both mean (7.866) and median (2.770).`,
+  `Compare Soothsayer's P/S (6.71) to its peer group: exceeds both mean (3.341) and median (1.920).`,
+  `Conclude on Soothsayer: also overvalued by both measures. Note the large mean-median gaps in each peer group — a sign of outliers distorting the mean.`
+ ], final:`Both Crisco and Soothsayer appear overvalued relative to their respective peer groups.`},
+
+{id:'p17', tag:'LOS 20.l / 20.n', title:"Comprehensive Vignette — Home Decor vs. Lester's",
+ scenario:`Comparison per-share data:
+ <div class="table-scroll"><table class="mini"><tr><th></th><th>Price</th><th>Trailing CF/sh</th><th>P/CF</th><th>Trailing FCFE/sh</th><th>P/FCFE</th><th>5-yr growth</th><th>Beta</th></tr>
+ <tr><td>Lester's</td><td>$47.8</td><td>$2.00</td><td>23.90</td><td>$0.36</td><td>132.78</td><td>17.5%</td><td>1.22</td></tr>
+ <tr><td>Home Decor</td><td>$28.4</td><td>$1.36</td><td>20.88</td><td>$0.99</td><td>28.69</td><td>22.2%</td><td>1.36</td></tr></table></div>
+ Home Decor is also trading at $28.40, currently at a P/B of 3.31 (91% of the home-improvement industry average of 3.62, forecasted ROE 19.29% ≈ industry's 19.29%). Lester's P/B is 4.32 (119% of the same industry average, forecasted ROE 18.90%, slightly below industry's 19.29%).
+ <br><br>Separately, Lester's reports (in its financial statements): net income $1,023,262,000; depreciation $534,102,000; CFO $1,497,442,000; a $139,870,000 nonrecurring operating expense; 631,643,000 basic shares outstanding; marginal tax rate 37%; current price $42.10 (a different, more detailed data point than the $47.8 rounded figure above — use $42.10 for the P/CF/P/CFO calculations below).
+ <br><br>Part 1: Using P/CF and P/FCFE, which stock looks more attractively valued? Part 2: Using P/B versus the industry and each other, which looks more attractively valued? Part 3: Calculate Lester's P/CF using earnings-plus-noncash-charges. Part 4: Calculate Lester's adjusted P/CFO after removing the nonrecurring expense (after-tax).`,
+ steps:[
+  `<b>Part 1:</b> Home Decor's P/CF (20.88) is 87.4% of Lester's (23.90), and Home Decor's P/FCFE (28.69) is only 21.6% of Lester's (132.78) — despite Home Decor having the HIGHER expected growth (22.2% vs. 17.5%), which should normally justify a higher multiple, not a lower one. Conclusion: <b>Home Decor appears undervalued relative to Lester's.</b>`,
+  `<b>Part 2:</b> Home Decor's P/B (3.31) is 91% of its industry average with an ROE matching the industry → undervalued vs. industry. Lester's P/B (4.32) is 119% of the same industry average with a slightly below-average ROE → overvalued vs. industry. Home Decor also trades at only 76.6% of Lester's P/B (3.31/4.32), reinforcing that <b>Home Decor looks more attractively valued on a P/B basis too.</b>`,
+  `<b>Part 3:</b> CF = net income + depreciation = $1,023,262,000 + $534,102,000 = $1,557,364,000. CF/share = $1,557,364,000 / 631,643,000 = $2.4656.`,
+  `<b>Part 3 (cont.):</b> P/CF = $42.10 / $2.4656 = <b>17.08×</b>.`,
+  `<b>Part 4:</b> Adjust CFO for the nonrecurring expense (add back after-tax): adjusted CFO = $1,497,442,000 + $139,870,000×(1−0.37) = $1,497,442,000 + $88,118,100 = $1,585,560,100.`,
+  `<b>Part 4 (cont.):</b> Adjusted CFO/share = $1,585,560,100 / 631,643,000 = $2.51. Adjusted P/CFO = $42.10 / $2.51 = <b>16.77× (≈17×)</b>.`
+ ], final:`Home Decor appears undervalued relative to Lester's on both P/CF-family and P/B measures. Lester's P/CF = 17.08×; adjusted P/CFO = 16.77× (≈17×).`},
+
+{id:'p18', tag:'LOS 20.r', title:'Weighted Harmonic Mean — Two-Stock Portfolio P/E',
+ scenario:`Stock 1: price $10, EPS $1 (P/E = 10). Stock 2: price $16, EPS $2 (P/E = 8). A portfolio holds one share of each. Calculate the TRUE portfolio P/E, then calculate the arithmetic mean, the weighted (price) arithmetic mean, the harmonic mean, and the weighted harmonic mean of the two individual P/Es. Which measure matches the true portfolio P/E?`,
+ steps:[
+  `TRUE portfolio P/E = total price / total earnings = (10+16) / (1+2) = 26/3 = <b>8.67×</b>.`,
+  `Arithmetic mean = (10+8)/2 = <b>9.00</b>.`,
+  `Weighted arithmetic mean (weights = price/total price = 10/26 and 16/26) = (10/26)×10 + (16/26)×8 = <b>8.76</b>.`,
+  `Harmonic mean = 2 / [(1/10)+(1/8)] = 2/0.225 = <b>8.89</b>.`,
+  `Weighted harmonic mean = 1 / [(10/26)×(1/10) + (16/26)×(1/8)] = 1/(1/26 + 2/26) = 1/(3/26) = 26/3 = <b>8.67</b>.`
+ ], final:`The weighted harmonic mean (8.67) exactly matches the true portfolio P/E — the only measure of the four that does.`},
+];
+
+// Firebase is loaded dynamically and wrapped in try/catch so that a blocked or
+// unreachable CDN (corporate firewalls, offline use, restricted sandboxes) never
+// prevents the rest of the app (flashcards/quiz/practice) from working — it just
+// falls back to localStorage only. See knowledge-base note on this architecture tradeoff.
+const FIREBASE_STATE_PATH = "cfa/reading20_market_multiples/progress";
+const LOCAL_CACHE_KEY = "equity4-cfa-reading20-state";
+let fbDatabase = null, fbRef = null, fbGet = null, fbSet = null, firebaseAvailable = false;
+
+async function initFirebase(){
+  try{
+    const appMod = await import("https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js");
+    const dbMod = await import("https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js");
+    const firebaseApp = appMod.initializeApp({ databaseURL: "https://equity4-1ea61-default-rtdb.asia-southeast1.firebasedatabase.app/" });
+    fbDatabase = dbMod.getDatabase(firebaseApp);
+    fbRef = dbMod.ref; fbGet = dbMod.get; fbSet = dbMod.set;
+    firebaseAvailable = true;
+  }catch(e){
+    console.warn("Firebase SDK unavailable — falling back to localStorage only.", e);
+    firebaseAvailable = false;
+  }
+}
+function firebaseStateRef(){ return fbRef(fbDatabase, FIREBASE_STATE_PATH); }
+
+const LOS_ORDER = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r'];
+const VIEW_SEQUENCE = ['overview', ...LOS_ORDER, 'review','quiz','practice'];
+const FLASHCARD_VIEWS = [...LOS_ORDER, 'review'];
+
+const LOS_META = {
+  a:{title:'Comparables vs. Fundamentals', icon:'⚖️'},
+  b:{title:'Justified Price Multiple', icon:'🎯'},
+  c:{title:'Rationales & Drawbacks', icon:'📋'},
+  d:{title:'Calculating the Ratios', icon:'🧮'},
+  e:{title:'Underlying & Normalized EPS', icon:'📐'},
+  f:{title:'Earnings Yield (E/P)', icon:'🔁'},
+  g:{title:'Fundamental Drivers', icon:'🧭'},
+  h:{title:'Predicted P/E (Regression)', icon:'📈'},
+  i:{title:'Justified P/E, P/B, P/S', icon:'🏛️'},
+  j:{title:'PEG Ratio', icon:'🚀'},
+  k:{title:'Multiples for Terminal Value', icon:'🏁'},
+  l:{title:'Over/Under/Fairly Valued', icon:'⚖️'},
+  m:{title:'Role of Fundamentals', icon:'🔍'},
+  n:{title:'Cash Flow Definitions', icon:'💵'},
+  o:{title:'EV Multiples & EV/EBITDA', icon:'🏢'},
+  p:{title:'Cross-Border Comparisons', icon:'🌍'},
+  q:{title:'Momentum Indicators', icon:'⚡'},
+  r:{title:'Mean of a Group of Multiples', icon:'📊'},
+};
+
+let state = { cardProgress:{}, quizHistory:[], practiceDone:{} };
+const BOX_INTERVAL_DAYS = [0,0,1,3,7,14];
+
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+
+function isDue(cardId){
+  const p = state.cardProgress[cardId];
+  if(!p) return true;
+  return p.due <= todayStr();
+}
+function boxOf(cardId){ return (state.cardProgress[cardId] && state.cardProgress[cardId].box) || 0; }
+
+function gradeCard(cardId, grade){
+  let p = state.cardProgress[cardId] || {box:0, due: todayStr()};
+  if(grade==='forgot') p.box = 1;
+  else if(grade==='good') p.box = Math.min(5, (p.box||0)+1);
+  else if(grade==='easy') p.box = Math.min(5, (p.box||0)+2);
+  const days = BOX_INTERVAL_DAYS[p.box] ?? 0;
+  const d = new Date(); d.setDate(d.getDate()+days);
+  p.due = d.toISOString().slice(0,10);
+  state.cardProgress[cardId] = p;
+  saveState();
+  updateStatsBar();
+  updateNavDots();
+}
+
+function masteryPercent(){
+  if(!ALL_CARDS.length) return 0;
+  let n=0; ALL_CARDS.forEach(c=>{ if(boxOf(c.id)>=4) n++; });
+  return Math.round(n/ALL_CARDS.length*100);
+}
+function dueCount(){ return ALL_CARDS.filter(c=>isDue(c.id)).length; }
+function sectionMasteryState(sectionId){
+  const cards = FLASHCARDS[sectionId];
+  if(!cards || !cards.length) return 'none';
+  const started = cards.some(c=>boxOf(c.id)>0);
+  const mastered = cards.every(c=>boxOf(c.id)>=4);
+  if(mastered) return 'mastered';
+  if(started) return 'started';
+  return 'none';
+}
+
+let ALL_CARDS = [];
+
+// ============ FLASHCARD BROWSER (container-scoped) ============
+function renderFlashcardBrowser(containerId, cardsList, opts){
+  opts = opts || {};
+  const container = document.getElementById(containerId);
+  if(!container) return;
+  if(!cardsList.length){
+    container.innerHTML = `<div class="empty-state"><div class="big">🎉</div>No cards due for review right now.</div>`;
+    return;
+  }
+  let idx = 0;
+  let flipped = false;
+
+  function draw(){
+    const c = cardsList[idx];
+    flipped = false;
+    container.innerHTML = `
+      <div class="deck-head">
+        <div class="deck-progress">Card ${idx+1} / ${cardsList.length}${opts.showBox ? ' · box: '+boxOf(c.id) : ''}</div>
+        <div class="btn-row" style="margin-top:0;">
+          <button class="btn btn-ghost fc-prev">← Prev</button>
+          <button class="btn btn-ghost fc-next">Next →</button>
+        </div>
+      </div>
+      <div class="flip-hint">Click the card (or press Space) to flip</div>
+      <div class="flashcard fc-card">
+        <div class="flashcard-inner">
+          <div class="flashcard-face face-front"><span class="eyebrow">LOS 20.${c.id.replace(/[0-9]/g,'')} · QUESTION</span><div class="txt">${c.q}</div></div>
+          <div class="flashcard-face face-back"><div class="txt">${c.a}</div></div>
+        </div>
+      </div>
+      <div class="grade-row fc-grades" style="visibility:hidden;">
+        <button class="btn btn-rust" data-g="forgot">😵 Forgot</button>
+        <button class="btn btn-ghost" data-g="good">🙂 Got it</button>
+        <button class="btn btn-green" data-g="easy">😎 Easy</button>
+      </div>
+      <div class="kbd-hint-row">
+        <span><span class="kbd">←</span> Prev card</span>
+        <span><span class="kbd">→</span> Next card</span>
+        <span><span class="kbd">Space</span> Flip</span>
+        <span><span class="kbd">Enter</span> Next module</span>
+      </div>
+    `;
+    container.querySelector('.fc-card').addEventListener('click', ()=>{
+      flipped = !flipped;
+      container.querySelector('.fc-card').classList.toggle('flipped', flipped);
+      container.querySelector('.fc-grades').style.visibility = flipped ? 'visible' : 'hidden';
+    });
+    container.querySelector('.fc-prev').addEventListener('click', ()=>{ idx = (idx-1+cardsList.length)%cardsList.length; draw(); });
+    container.querySelector('.fc-next').addEventListener('click', ()=>{ idx = (idx+1)%cardsList.length; draw(); });
+    container.querySelectorAll('.fc-grades [data-g]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        gradeCard(c.id, btn.getAttribute('data-g'));
+        if(idx < cardsList.length-1){ idx++; draw(); }
+        else{
+          container.innerHTML = `<div class="empty-state"><div class="big">🎉</div>You've reviewed all cards in this deck!<div class="btn-row" style="justify-content:center;"><button class="btn btn-primary fc-restart">Review again</button></div></div>`;
+          container.querySelector('.fc-restart').addEventListener('click', ()=>{ idx=0; draw(); });
+        }
+      });
+    });
+  }
+  draw();
+}
+
+function initSectionDecks(){
+  LOS_ORDER.forEach(sec=>{
+    renderFlashcardBrowser('deck-holder-'+sec, FLASHCARDS[sec], {showBox:true});
+  });
+}
+
+function renderReview(){
+  const due = shuffle(ALL_CARDS.filter(c=>isDue(c.id)));
+  let container = document.getElementById('review-deck');
+  if(!due.length){
+    container.innerHTML = `<div class="empty-state"><div class="big">🎉</div>No cards due for review right now.<div class="btn-row" style="justify-content:center;"><button class="btn btn-primary" id="review-all-btn">Review all ${ALL_CARDS.length} cards now</button></div></div>`;
+    document.getElementById('review-all-btn').addEventListener('click', ()=>{
+      renderFlashcardBrowser('review-deck', shuffle(ALL_CARDS), {showBox:true});
+    });
+    return;
+  }
+  renderFlashcardBrowser('review-deck', due, {showBox:true});
+}
+
+// ============ OVERVIEW ROADMAP ============
+function renderOverviewRoadmap(){
+  const container = document.getElementById('overview-roadmap');
+  if(!container) return;
+  const icons = {mastered:'✅', started:'🟡', none:'⚪'};
+  let html = '';
+  LOS_ORDER.forEach(sec=>{
+    const st = sectionMasteryState(sec);
+    const meta = LOS_META[sec];
+    html += `<button class="roadmap-item" data-view="${sec}"><span class="ic">${icons[st]}</span><span class="txt"><span class="ttl">LOS 20.${sec} — ${meta.title}</span><span class="sub">${FLASHCARDS[sec].length} flashcards</span></span><span class="arrow">${meta.icon}</span></button>`;
+  });
+  html += `<button class="roadmap-item" data-view="review"><span class="ic">🔁</span><span class="txt"><span class="ttl">Spaced Review</span><span class="sub">${dueCount()} cards due now</span></span><span class="arrow">→</span></button>`;
+  html += `<button class="roadmap-item" data-view="quiz"><span class="ic">📝</span><span class="txt"><span class="ttl">Module Quiz</span><span class="sub">${QUIZ.length} questions</span></span><span class="arrow">→</span></button>`;
+  html += `<button class="roadmap-item" data-view="practice"><span class="ic">🧮</span><span class="txt"><span class="ttl">Practice Problems</span><span class="sub">${PRACTICE.length} step-reveal problems</span></span><span class="arrow">→</span></button>`;
+  container.innerHTML = html;
+  container.querySelectorAll('.roadmap-item[data-view]').forEach(btn=>{
+    btn.addEventListener('click', ()=> navigateTo(btn.getAttribute('data-view')) );
+  });
+}
+
+// ============ STATS / NAV DOTS ============
+function updateStatsBar(){
+  document.getElementById('mastery-pct').textContent = masteryPercent()+'%';
+  document.getElementById('due-count').textContent = dueCount();
+  const ov = document.getElementById('ov-cardcount');
+  if(ov) ov.textContent = ALL_CARDS.length;
+}
+function updateNavDots(){
+  LOS_ORDER.forEach(sec=>{
+    const st = sectionMasteryState(sec);
+    document.querySelectorAll('.mastery-dot[data-sec="'+sec+'"]').forEach(dot=>{
+      dot.classList.remove('started','mastered');
+      if(st==='started') dot.classList.add('started');
+      if(st==='mastered') dot.classList.add('mastered');
+    });
+  });
+  renderOverviewRoadmap();
+}
+
+// ============ QUIZ ============
+let quizState = null;
+function renderQuizSetup(){
+  const area = document.getElementById('quiz-area');
+  const last = state.quizHistory[state.quizHistory.length-1];
+  area.innerHTML = `
+    <div class="quiz-setup">
+      <button class="btn btn-primary" data-n="10">10 questions</button>
+      <button class="btn btn-primary" data-n="20">20 questions</button>
+      <button class="btn btn-primary" data-n="${QUIZ.length}">All (${QUIZ.length}) questions</button>
+    </div>
+    ${last ? `<p style="color:var(--text-dim); font-size:12.5px;">Last attempt: <span class="quiz-score">${last.score}/${last.total}</span></p>` : ''}
+  `;
+  area.querySelectorAll('[data-n]').forEach(btn=>{
+    btn.addEventListener('click', ()=> startQuiz(parseInt(btn.getAttribute('data-n'))) );
+  });
+}
+function startQuiz(n){
+  const pool = shuffle(QUIZ).slice(0, n);
+  quizState = { pool, idx:0, score:0, answered:false, wrongList:[] };
+  renderQuizQuestion();
+}
+function renderQuizQuestion(){
+  const area = document.getElementById('quiz-area');
+  const q = quizState.pool[quizState.idx];
+  const order = shuffle(q.opts.map((text,i)=>({text,i})));
+  quizState.currentOrder = order;
+  quizState.answered = false;
+  const letters = ['A','B','C'];
+  area.innerHTML = `
+    <div class="quiz-card">
+      <div class="quiz-progress">Question ${quizState.idx+1} / ${quizState.pool.length} · LOS 20.${q.section} · Score: ${quizState.score}</div>
+      <div class="quiz-q">${q.q}</div>
+      ${order.map((o,pos)=>`<button class="opt" data-pos="${pos}"><span class="oletter">${letters[pos]}.</span><span>${o.text}</span></button>`).join('')}
+    </div>
+  `;
+  area.querySelectorAll('.opt').forEach(btn=>{
+    btn.addEventListener('click', ()=> answerQuiz(parseInt(btn.getAttribute('data-pos'))) );
+  });
+}
+function answerQuiz(pos){
+  if(quizState.answered) return;
+  quizState.answered = true;
+  const q = quizState.pool[quizState.idx];
+  const order = quizState.currentOrder;
+  const chosen = order[pos];
+  const correctPos = order.findIndex(o=>o.i===q.correct);
+  const isCorrect = chosen.i === q.correct;
+  if(isCorrect) quizState.score++;
+  else quizState.wrongList.push({q:q.q, correctText:q.opts[q.correct], exp:q.exp});
+
+  document.querySelectorAll('#quiz-area .opt').forEach((btn,i)=>{
+    btn.disabled = true;
+    if(i===correctPos) btn.classList.add('correct');
+    else if(i===pos) btn.classList.add('wrong');
+  });
+  const isLast = quizState.idx === quizState.pool.length-1;
+  const expBlock = document.createElement('div');
+  expBlock.className = 'quiz-exp';
+  expBlock.innerHTML = `<span class="lbl">Explanation</span>${q.exp}<div class="btn-row"><button class="btn btn-primary quiz-next-btn">${isLast ? 'See results' : 'Next question →'}</button></div>`;
+  document.querySelector('.quiz-card').appendChild(expBlock);
+  document.querySelector('.quiz-next-btn').addEventListener('click', ()=>{
+    if(isLast) finishQuiz();
+    else{ quizState.idx++; renderQuizQuestion(); }
+  });
+}
+function finishQuiz(){
+  state.quizHistory.push({date: todayStr(), score: quizState.score, total: quizState.pool.length});
+  saveState();
+  const area = document.getElementById('quiz-area');
+  const pct = Math.round(quizState.score/quizState.pool.length*100);
+  area.innerHTML = `
+    <div class="quiz-card" style="text-align:center;">
+      <div class="big" style="font-size:34px; margin-bottom:6px;">${pct>=80?'🎉':pct>=60?'👍':'📚'}</div>
+      <div style="font-size:20px; font-weight:700;">You scored <span class="quiz-score">${quizState.score}/${quizState.pool.length}</span> (${pct}%)</div>
+      ${quizState.wrongList.length ? `<h4 style="margin-top:20px;">Questions to review</h4><div class="wronglist">${quizState.wrongList.map(w=>`<div class="wl-item"><b>${w.q}</b><br>Correct answer: ${w.correctText}<br><span style="color:var(--text-dim);">${w.exp}</span></div>`).join('')}</div>` : '<p style="color:var(--green); margin-top:14px;">Perfect score — no questions to review!</p>'}
+      <div class="btn-row" style="justify-content:center;"><button class="btn btn-primary" id="quiz-again-btn">Take another quiz</button></div>
+    </div>
+  `;
+  document.getElementById('quiz-again-btn').addEventListener('click', renderQuizSetup);
+}
+function handleQuizKeydown(e){
+  if(!quizState) return;
+  if(!quizState.answered && ['1','2','3'].includes(e.key)){
+    const i = parseInt(e.key)-1;
+    const opts = document.querySelectorAll('#quiz-area .opt');
+    if(opts[i]) opts[i].click();
+  } else if(e.key === 'Enter'){
+    const nextBtn = document.querySelector('.quiz-next-btn') || document.getElementById('quiz-again-btn');
+    if(nextBtn){ e.preventDefault(); nextBtn.click(); }
+  }
+}
+
+// ============ PRACTICE ============
+function renderPractice(){
+  const area = document.getElementById('practice-area');
+  area.innerHTML = PRACTICE.map(p=>`
+    <div class="practice-card" id="practice-${p.id}">
+      <div class="ph">
+        <div><span class="tag tag-gold">${p.tag}</span> <h3>${p.title}</h3></div>
+        <label class="done-check"><input type="checkbox" data-practice="${p.id}" ${state.practiceDone[p.id]?'checked':''}> Done</label>
+      </div>
+      <div class="practice-scenario">${p.scenario}</div>
+      <p style="font-size:12.5px; color:var(--text-dim); margin:0 0 10px;">Work it out yourself, then reveal each step to check:</p>
+      ${p.steps.map((s,i)=>`<details><summary>Reveal step ${i+1}</summary><div class="step-body">${s}</div></details>`).join('')}
+      <div class="practice-final">Answer: ${p.final}</div>
+    </div>
+  `).join('');
+  area.querySelectorAll('[data-practice]').forEach(chk=>{
+    chk.addEventListener('change', ()=>{
+      state.practiceDone[chk.getAttribute('data-practice')] = chk.checked;
+      saveState();
+    });
+  });
+}
+
+// ============ ROUTING ============
+function navigateTo(view){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const target = document.getElementById('view-'+view);
+  if(!target) return;
+  target.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.nav-item[data-view="'+view+'"]').forEach(b=>b.classList.add('active'));
+  document.querySelector('.main').scrollTo({top:0, behavior:'instant'});
+  if(view==='review') renderReview();
+  if(view==='quiz') renderQuizSetup();
+  if(view==='practice') renderPractice();
+  if(view==='overview') renderOverviewRoadmap();
+  if(document.activeElement && document.activeElement.tagName==='BUTTON') document.activeElement.blur();
+}
+document.querySelectorAll('.nav-item[data-view]').forEach(btn=>{
+  btn.addEventListener('click', ()=> navigateTo(btn.getAttribute('data-view')) );
+});
+
+function goToNextModule(){
+  const activeViewEl = document.querySelector('.view.active');
+  if(!activeViewEl) return;
+  const cur = activeViewEl.id.replace('view-','');
+  const idx = VIEW_SEQUENCE.indexOf(cur);
+  if(idx >= 0 && idx < VIEW_SEQUENCE.length-1){
+    navigateTo(VIEW_SEQUENCE[idx+1]);
+  }
+}
+
+// ============ KEYBOARD SHORTCUTS (single global listener) ============
+document.addEventListener('keydown', (e)=>{
+  const tag = (e.target && e.target.tagName) || '';
+  if(['INPUT','TEXTAREA','SELECT'].includes(tag)) return;
+
+  const activeViewEl = document.querySelector('.view.active');
+  if(!activeViewEl) return;
+  const activeViewId = activeViewEl.id.replace('view-','');
+
+  if(activeViewId === 'quiz'){ handleQuizKeydown(e); return; }
+
+  if(FLASHCARD_VIEWS.includes(activeViewId)){
+    if(e.key === 'ArrowRight'){
+      e.preventDefault();
+      const btn = activeViewEl.querySelector('.fc-next');
+      if(btn) btn.click();
+    } else if(e.key === 'ArrowLeft'){
+      e.preventDefault();
+      const btn = activeViewEl.querySelector('.fc-prev');
+      if(btn) btn.click();
+    } else if(e.key === ' ' || e.code === 'Space'){
+      if(tag !== 'BUTTON'){
+        e.preventDefault();
+        const card = activeViewEl.querySelector('.fc-card');
+        if(card) card.click();
+      }
+    } else if(e.key === 'Enter'){
+      if(tag !== 'BUTTON'){
+        e.preventDefault();
+        goToNextModule();
+      }
+    }
+  } else if(e.key === 'Enter' && tag !== 'BUTTON'){
+    e.preventDefault();
+    goToNextModule();
+  }
+});
+
+// ============ FIREBASE SYNC ============
+function setSyncStatus(text, ok){
+  document.getElementById('sync-status').textContent = text;
+  const dot = document.getElementById('sync-dot');
+  if(dot) dot.style.background = ok===false ? 'var(--rust)' : 'var(--green)';
+}
+function cacheState(){
+  try{ localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(state)); }
+  catch(e){ console.warn("Could not write local cache:", e); }
+}
+function loadCachedState(){
+  try{
+    const raw = localStorage.getItem(LOCAL_CACHE_KEY);
+    if(!raw) return false;
+    const saved = JSON.parse(raw);
+    state.cardProgress = saved.cardProgress || {};
+    state.quizHistory = Array.isArray(saved.quizHistory) ? saved.quizHistory : [];
+    state.practiceDone = saved.practiceDone || {};
+    return true;
+  }catch(e){ return false; }
+}
+function refreshAllUI(){
+  updateStatsBar();
+  updateNavDots();
+}
+async function loadState(){
+  const hadCache = loadCachedState();
+  setSyncStatus(hadCache ? "Checking Firebase…" : "Syncing…");
+  refreshAllUI();
+  if(!firebaseAvailable){
+    setSyncStatus(hadCache ? "Offline / using local cache" : "Offline — local storage only", false);
+    refreshAllUI();
+    return;
+  }
+  try{
+    const snapshot = await fbGet(firebaseStateRef());
+    if(snapshot.exists()){
+      const saved = snapshot.val() || {};
+      state.cardProgress = saved.cardProgress || {};
+      state.quizHistory = Array.isArray(saved.quizHistory) ? saved.quizHistory : [];
+      state.practiceDone = saved.practiceDone || {};
+      cacheState();
+      setSyncStatus("Synced with Firebase");
+    }else{
+      await fbSet(firebaseStateRef(), { cardProgress: state.cardProgress, quizHistory: state.quizHistory, practiceDone: state.practiceDone, updatedAt: new Date().toISOString() });
+      cacheState();
+      setSyncStatus("Firebase initialized");
+    }
+  }catch(e){
+    setSyncStatus("Offline / using local cache", false);
+  }
+  refreshAllUI();
+}
+async function saveState(){
+  cacheState();
+  if(!firebaseAvailable){ setSyncStatus("Saved locally (offline)", false); return; }
+  try{
+    await fbSet(firebaseStateRef(), { cardProgress: state.cardProgress, quizHistory: state.quizHistory, practiceDone: state.practiceDone, updatedAt: new Date().toISOString() });
+    setSyncStatus("Saved to Firebase");
+  }catch(e){ setSyncStatus("Not synced to Firebase", false); }
+}
+
+// ============ INIT ============
+async function init(){
+  ALL_CARDS = Object.values(FLASHCARDS).flat();
+  initSectionDecks();
+  await initFirebase();
+  await loadState();
+}
+init();
+
+</script>
+</body>
+</html>
