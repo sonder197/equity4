@@ -8,27 +8,37 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;600;700;900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+/* ==========================================================================
+   Reading 20 — Market-Based Valuation: Price and Enterprise Value Multiples
+   Design system: light theme — copied verbatim from reading18_ddm_valuation.html
+   (the project's canonical light-theme reference) per explicit instruction.
+   New components not present in R18 (compare-cols, steps-flow, criteria-list,
+   mean-bars, scope-scale) are built using R18's exact tokens/spacing/radius/
+   font conventions so they read as native extensions, not a different system.
+   ========================================================================== */
 :root{
   --bg:#F0EBE0;
-  --surface:#E4DDCB;
   --surface-2:#B3A891;
-  --surface-3:#8F856E;
-  --border:#C4B9A0;
-  --gold:#A38228;
-  --gold-soft:#826613;
-  --green:#2E6F52;
-  --green-soft:#5A9A7C;
-  --rust:#A43F26;
-  --rust-soft:#C4744C;
-  --blue:#3E5F8A;
-  --blue-soft:#6E8FB8;
   --text:#1B1A17;
-  --text-muted:#3A362E;
-  --text-dim:#6B6152;
+  --text-muted:#2B2822;
+  --gold-soft:#826613;
+  --gold:#A38228;
+  --surface:#E4DBC7;
+  --surface-3:#968873;
+  --border:#C4B89C;
+  --green:#4A7A69;
+  --green-soft:#3D6656;
+  --rust:#A2492E;
+  --rust-soft:#8A3B23;
+  --blue:#4A6690;
+  --blue-soft:#3D5578;
+  --text-dim:#6B6250;
+
   --radius:10px;
   --radius-lg:14px;
-  --shadow: 0 8px 24px rgba(60,50,30,.15);
+  --shadow: 0 8px 24px rgba(60,46,20,.12);
 }
+
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
 body{
@@ -40,387 +50,409 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 h1,h2,h3,h4{font-family:'Roboto Slab',serif; margin:0 0 10px; color:var(--text);}
-a{color:var(--blue);}
+h4{font-size:16.5px; color:var(--gold-soft); font-weight:700; margin-top:22px;}
+p{margin:0 0 12px;}
+a{color:var(--blue-soft);}
+code, .mono{font-family:'IBM Plex Mono',monospace;}
+::selection{background:var(--gold); color:var(--text);}
+
 #app{display:flex; min-height:100vh; max-width:1400px; margin:0 auto;}
 
-/* ============ SIDEBAR ============ */
+/* ---------- SIDEBAR ---------- */
 .sidebar{
   width:290px; flex-shrink:0; position:sticky; top:0; height:100vh; overflow-y:auto;
   background:var(--surface); border-right:1px solid var(--border);
-  padding:22px 18px 40px; display:flex; flex-direction:column; gap:16px;
+  padding:22px 18px 30px; scrollbar-width:thin;
 }
-.brand{display:flex; align-items:flex-start; gap:10px; padding-bottom:4px;}
-.brand-mark{flex-shrink:0; margin-top:2px;}
-.brand-eyebrow{font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.06em; color:var(--gold); font-weight:600;}
-.brand-title{font-family:'Roboto Slab',serif; font-weight:700; font-size:16px; line-height:1.28; margin-top:2px;}
-.sidebar-stats{display:flex; gap:8px;}
-.stat-chip{flex:1; background:var(--surface-2); border-radius:var(--radius); padding:9px 10px; text-align:center;}
+.brand{display:flex; align-items:center; gap:12px; margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid var(--border);}
+.brand-mark{width:38px; height:38px; flex-shrink:0;}
+.brand-eyebrow{font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.09em; color:var(--gold); font-weight:600; text-transform:uppercase;}
+.brand-name{font-family:'Roboto Slab',serif; font-weight:700; font-size:15px; line-height:1.25; margin-top:2px;}
+
+.sidebar-stats{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px;}
+.stat-chip{background:var(--surface-2); border-radius:var(--radius); padding:9px 10px; text-align:center;}
 .stat-chip .v{font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:17px; color:var(--gold-soft);}
-.stat-chip .l{font-size:10.5px; color:var(--text-muted); margin-top:1px;}
-.sync-line{font-size:11px; color:var(--text-dim); display:flex; align-items:center; gap:5px; padding:0 2px;}
-.sync-dot{width:6px; height:6px; border-radius:50%; background:var(--green); flex-shrink:0;}
-.nav-group-label{font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.07em; color:var(--text-dim); text-transform:uppercase; margin:6px 2px 2px; font-weight:600;}
+.stat-chip .l{font-size:10.5px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; margin-top:2px;}
+
+.sync-line{font-size:11px; color:var(--text-dim); margin-bottom:18px; font-family:'IBM Plex Mono',monospace;}
+.sync-line #sync-status{color:var(--green-soft); font-weight:600;}
+.sync-line.offline #sync-status{color:var(--rust-soft);}
+
+.nav-group-label{font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-dim); font-weight:600; margin:16px 0 6px 4px;}
 .nav-item{
   display:flex; align-items:center; gap:9px; width:100%; text-align:left;
   background:none; border:none; padding:8px 9px; border-radius:8px; cursor:pointer;
-  font-family:'Inter',sans-serif; font-size:13px; color:var(--text-muted); line-height:1.3;
+  font-family:'Inter',sans-serif; font-size:13.3px; color:var(--text-muted);
+  margin-bottom:2px; transition:background .15s;
 }
 .nav-item:hover{background:var(--surface-2);}
-.nav-item.active{background:var(--gold); color:#fff; font-weight:600;}
-.nav-item.active .mastery-dot{background:#fff;}
-.mastery-dot{width:8px; height:8px; border-radius:50%; background:var(--border); flex-shrink:0;}
-.mastery-dot.started{background:var(--blue);}
-.mastery-dot.mastered{background:var(--green);}
-.nav-item .code{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--text-dim); flex-shrink:0;}
-.nav-item.active .code{color:#fff;}
+.nav-item.active{background:var(--surface-2); color:var(--text); font-weight:600;}
+.nav-item .dot{width:8px; height:8px; border-radius:50%; flex-shrink:0; background:var(--border); border:1.5px solid var(--text-dim);}
+.nav-item .dot.started{background:var(--gold); border-color:var(--gold);}
+.nav-item .dot.mastered{background:var(--green); border-color:var(--green);}
+.nav-item .los-code{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-dim); flex-shrink:0;}
+.nav-item.practice-item{font-weight:600;}
 
-/* ============ MAIN ============ */
-.main{flex:1; min-width:0; padding:28px 40px 90px;}
+/* ---------- MAIN ---------- */
+.main{flex:1; min-width:0; padding:28px 40px 80px;}
 .view{display:none;}
-.view.active{display:block;}
+.view.active{display:block; animation:fadein .2s ease;}
+@keyframes fadein{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+
 .los-tag{
   display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:11.5px; font-weight:600;
-  color:#fff; background:var(--gold); padding:4px 11px; border-radius:20px; letter-spacing:.03em;
+  background:var(--gold); color:var(--text); padding:4px 11px; border-radius:20px; letter-spacing:.03em;
+  margin-bottom:10px;
 }
 .module-tag{
   display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:10.5px; font-weight:600;
-  color:var(--text-dim); background:var(--surface); border:1px solid var(--border); padding:3px 9px; border-radius:20px; margin-left:8px;
+  color:var(--text-dim); letter-spacing:.06em; text-transform:uppercase; margin-bottom:8px;
 }
-.section-title{font-size:23px; margin:12px 0 4px;}
-.section-sub{color:var(--text-dim); font-size:14px; margin-bottom:22px; max-width:640px;}
+.section-title{font-size:25px; margin-bottom:4px;}
+.section-sub{color:var(--text-muted); font-size:14px; margin-bottom:22px;}
 
 .theory{max-width:720px;}
-.theory p{margin:0 0 14px;}
-.theory h4{font-size:15.5px; margin:22px 0 10px; color:var(--gold-soft);}
-.theory ul, .theory ol{margin:0 0 14px; padding-left:22px;}
-.theory li{margin-bottom:7px;}
-.theory strong{color:var(--text);}
+.theory p{color:var(--text-muted);}
+.theory ul, .theory ol{color:var(--text-muted); padding-left:22px; margin:0 0 12px;}
+.theory li{margin-bottom:6px;}
+.theory strong{color:var(--text); font-weight:700;}
 .theory em{color:var(--text-muted);}
+.theory h4:first-child{margin-top:0;}
 
 .callout{
-  background:var(--surface-2); border-left:3px solid var(--gold); border-radius:0 var(--radius) var(--radius) 0;
-  padding:14px 16px; margin:16px 0; color:var(--text-muted); font-size:14px;
+  background:var(--surface-2); border-left:3px solid var(--gold);
+  border-radius:0 var(--radius) var(--radius) 0; padding:13px 16px; margin:16px 0; color:var(--text-muted);
 }
-.callout .callout-label{
-  display:block; font-family:'IBM Plex Mono',monospace; font-size:10.5px; font-weight:500;
-  text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); margin-bottom:6px;
+.callout-label, .callout .callout-label{
+  font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+  color:var(--text-muted); margin-bottom:5px; display:block;
 }
 .callout p:last-child{margin-bottom:0;}
 
 .formula-box{
   background:var(--surface-3); border-radius:var(--radius-lg); padding:18px 20px; margin:16px 0;
-  font-family:'IBM Plex Mono',monospace; color:#fff; overflow-x:auto;
+  font-family:'IBM Plex Mono',monospace; color:var(--text);
 }
-.formula-box .label{
-  font-family:'Inter',sans-serif; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em;
-  color:#E4DCC8; margin-bottom:10px; font-weight:600;
-}
-.formula-box .eq{font-size:16px; text-align:center; padding:6px 0; color:#fff;}
-.formula-box .fdef{border-top:1px dashed rgba(255,255,255,.25); margin-top:12px; padding-top:10px; font-size:12px; font-family:'Inter',sans-serif; color:#E4DCC8;}
-.formula-box .fdef div{margin-bottom:4px;}
-.formula-box .fdef b{color:#fff; font-family:'IBM Plex Mono',monospace;}
-.frac{display:inline-block; vertical-align:middle; text-align:center; margin:0 4px;}
-.frac .num{display:block; padding:0 4px 3px; border-bottom:1.5px solid currentColor;}
-.frac .den{display:block; padding:3px 4px 0;}
+.formula-box .label{font-size:10.5px; text-transform:uppercase; letter-spacing:.07em; color:var(--gold-soft); font-weight:700; margin-bottom:10px; font-family:'Inter',sans-serif;}
+.formula-box .eq{font-size:16px; text-align:center; margin:10px 0; overflow-x:auto;}
+.formula-box .fdef{border-top:1px dashed var(--border); margin-top:12px; padding-top:10px; font-size:12.5px; color:var(--text-muted); font-family:'Inter',sans-serif;}
+.formula-box .fdef div{margin-bottom:3px;}
+.formula-box .fdef b{color:var(--text); font-family:'IBM Plex Mono',monospace;}
 
 table.dtable{width:100%; border-collapse:collapse; margin:16px 0; font-size:13.5px;}
-table.dtable th{background:var(--surface-3); color:#fff; text-align:left; padding:9px 12px; font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.03em;}
+table.dtable th{background:var(--surface-2); color:var(--text); text-align:left; padding:9px 12px; font-weight:600; border-bottom:2px solid var(--border);}
 table.dtable td{padding:9px 12px; border-bottom:1px solid var(--border); color:var(--text-muted);}
 table.dtable tr:last-child td{border-bottom:none;}
-table.dtable tr:nth-child(even) td{background:var(--surface);}
-table.mini{width:100%; border-collapse:collapse; margin:12px 0; font-size:12.8px; font-family:'IBM Plex Mono',monospace;}
-table.mini th, table.mini td{border:1px solid var(--border); padding:6px 9px; text-align:right;}
-table.mini th{background:var(--surface-3); color:#fff; text-align:right;}
-table.mini td:first-child, table.mini th:first-child{text-align:left; font-family:'Inter',sans-serif; font-weight:500;}
 
-.tag{display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600; padding:2px 9px; border-radius:14px; background:var(--surface-2); color:var(--text-muted);}
-.tag-rust{background:var(--rust); color:#fff;}
-.tag-green{background:var(--green); color:#fff;}
-.tag-gold{background:var(--gold); color:#fff;}
-.tag-blue{background:var(--blue); color:#fff;}
+table.mini{width:100%; border-collapse:collapse; margin:12px 0; font-size:13px; font-family:'IBM Plex Mono',monospace;}
+table.mini th, table.mini td{border:1px solid var(--border); padding:7px 10px; text-align:center;}
+table.mini th{background:var(--surface-2); font-weight:600; font-family:'Inter',sans-serif;}
+table.mini td:first-child, table.mini th:first-child{text-align:left; font-family:'Inter',sans-serif;}
+
+.tag{display:inline-block; font-size:11px; font-weight:700; padding:2px 9px; border-radius:20px; font-family:'IBM Plex Mono',monospace; letter-spacing:.02em; background:var(--surface-2); color:var(--text-muted);}
+.tag-rust{background:rgba(162,73,46,.14); color:var(--rust-soft);}
+.tag-green{background:rgba(74,122,105,.14); color:var(--green-soft);}
+.tag-gold{background:rgba(163,130,40,.16); color:var(--gold-soft);}
+.tag-blue{background:rgba(74,102,144,.14); color:var(--blue-soft);}
 
 .nudge{
-  display:flex; gap:10px; align-items:flex-start; background:var(--surface); border:1px dashed var(--border); border-radius:var(--radius);
-  padding:12px 14px; margin:16px 0; font-size:13px; color:var(--text-dim);
+  display:flex; gap:10px; align-items:flex-start; background:var(--surface-2);
+  border-radius:var(--radius); padding:12px 14px; margin:18px 0 6px; font-size:13px; color:var(--text-muted);
 }
 .nudge .ic{font-size:17px; flex-shrink:0;}
 .nudge .nudge-text{flex:1; min-width:0;}
 
 .btn{
-  font-family:'Inter',sans-serif; font-size:13px; font-weight:600; padding:9px 16px; border-radius:8px;
-  border:1px solid var(--border); background:var(--surface); color:var(--text); cursor:pointer;
+  display:inline-flex; align-items:center; gap:6px; font-family:'Inter',sans-serif; font-weight:600; font-size:13.5px;
+  padding:9px 16px; border-radius:9px; border:1px solid var(--border); background:var(--surface);
+  color:var(--text); cursor:pointer; transition:all .15s;
 }
-.btn:hover{filter:brightness(0.97);}
-.btn-primary{background:var(--gold); color:#fff; border-color:var(--gold);}
-.btn-green{background:var(--green); color:#fff; border-color:var(--green);}
-.btn-rust{background:var(--rust); color:#fff; border-color:var(--rust);}
+.btn:hover{transform:translateY(-1px); box-shadow:var(--shadow);}
+.btn-primary{background:var(--gold); border-color:var(--gold); color:var(--text);}
+.btn-green{background:var(--green); border-color:var(--green); color:#fff;}
+.btn-rust{background:var(--rust); border-color:var(--rust); color:#fff;}
 .btn-ghost{background:transparent;}
-.btn-row{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;}
+.btn-row{display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;}
 
 .kbd{
-  display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600;
-  background:var(--surface-3); color:#fff; padding:2px 7px; border-radius:5px; border-bottom:2px solid rgba(0,0,0,.25);
+  display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:11px; background:var(--surface-3);
+  color:var(--text); border:1px solid var(--border); border-bottom-width:2px; border-radius:5px; padding:2px 7px; font-weight:600;
 }
-.kbd-hint-row{display:flex; gap:18px; flex-wrap:wrap; justify-content:center; margin-top:16px; font-size:11.5px; color:var(--text-dim);}
+.kbd-hint-row{
+  display:flex; flex-wrap:wrap; justify-content:center; gap:16px; margin-top:16px; padding-top:14px;
+  border-top:1px solid var(--border); font-size:12px; color:var(--text-dim);
+}
 .kbd-hint-row span{display:flex; align-items:center; gap:6px;}
 
-.roadmap{display:flex; flex-direction:column; gap:8px; margin:14px 0;}
+.roadmap{display:flex; flex-direction:column; gap:8px; margin:16px 0;}
 .roadmap-item{
-  display:flex; align-items:center; gap:12px; background:var(--surface); border:1px solid var(--border);
-  border-radius:var(--radius); padding:12px 14px; cursor:pointer; text-align:left;
+  display:flex; align-items:center; gap:12px; background:var(--surface-2); border-radius:var(--radius);
+  padding:12px 15px; cursor:pointer; border:1px solid transparent; transition:border-color .15s;
+  width:100%; text-align:left; font-family:'Inter',sans-serif;
 }
 .roadmap-item:hover{border-color:var(--gold);}
-.roadmap-item .ic{font-size:17px; flex-shrink:0;}
-.roadmap-item .txt{flex:1; min-width:0; display:flex; flex-direction:column; gap:2px;}
-.roadmap-item .ttl{font-weight:600; font-size:13.5px; display:block;}
-.roadmap-item .sub{font-size:11.5px; color:var(--text-dim); display:block;}
-.roadmap-item .arrow{color:var(--text-dim); flex-shrink:0;}
+.roadmap-item .ric{font-size:17px; flex-shrink:0;}
+.roadmap-item .rit{flex:1; font-weight:600; font-size:13.5px; display:flex; flex-direction:column; gap:2px;}
+.roadmap-item .risub{font-size:11.5px; color:var(--text-muted); font-weight:400;}
+.roadmap-item .rarrow{color:var(--text-dim);}
 
-.stat-card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px; text-align:center;}
-.stat-card .v{font-family:'IBM Plex Mono',monospace; font-size:22px; font-weight:600; color:var(--gold-soft);}
-.stat-card .l{font-size:11.5px; color:var(--text-dim); margin-top:3px;}
+.stat-card{background:var(--surface-2); border-radius:var(--radius); padding:14px; text-align:center;}
+.stat-card .v{font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:22px; color:var(--gold-soft);}
+.stat-card .l{font-size:11px; color:var(--text-muted); margin-top:3px;}
 .stat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:18px 0;}
 
-/* ============ FLASHCARDS ============ */
-.deck-block{margin:26px 0;}
-.deck-block h3{font-size:15px; color:var(--gold-soft); margin-bottom:10px;}
-.deck-head{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; max-width:640px; margin:0 auto 10px;}
+/* ---------- Overview info box ---------- */
+.progress-ring-wrap{display:flex; align-items:center; gap:22px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px 24px; margin-bottom:22px;}
+.progress-ring-wrap .info{flex:1;}
+.progress-ring-wrap h3{margin:0 0 4px;}
+.progress-ring-wrap p{margin:0; color:var(--text-muted); font-size:13px;}
+
+/* ---------- FLASHCARD ---------- */
+.deck-block{margin:18px 0 30px;}
+.deck-block h3{font-size:16px; margin-bottom:10px; color:var(--gold-soft);}
 .deck-progress{font-size:12px; color:var(--text-dim); font-family:'IBM Plex Mono',monospace;}
+.deck-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px; max-width:640px; margin-left:auto; margin-right:auto;}
 .flip-hint{text-align:center; font-size:11.5px; color:var(--text-dim); margin-bottom:8px;}
+
 .flashcard{perspective:1200px; height:230px; max-width:640px; margin:0 auto 16px; cursor:pointer;}
 .flashcard-inner{position:relative; width:100%; height:100%; transition:transform .5s; transform-style:preserve-3d;}
 .flashcard.flipped .flashcard-inner{transform:rotateY(180deg);}
 .flashcard-face{
-  position:absolute; inset:0; backface-visibility:hidden; border-radius:var(--radius-lg);
-  border:1px solid var(--border); padding:22px 26px; display:flex; flex-direction:column; justify-content:center;
-  box-shadow:var(--shadow); overflow-y:auto;
+  position:absolute; inset:0; backface-visibility:hidden; border-radius:14px; padding:22px 26px;
+  display:flex; flex-direction:column; justify-content:center; overflow-y:auto;
+  border:1px solid var(--border); box-shadow:var(--shadow);
 }
 .face-front{background:var(--surface);}
-.face-back{background:var(--surface-3); color:#fff; transform:rotateY(180deg); border-color:var(--gold);}
-.face-front .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--gold); letter-spacing:.05em; margin-bottom:10px; font-weight:600;}
-.flashcard-face .txt{font-size:15px; line-height:1.55;}
-.face-back .txt{font-size:14px;}
-.grade-row{display:flex; gap:10px; justify-content:center; max-width:640px; margin:0 auto;}
-.empty-state{text-align:center; padding:40px 20px; color:var(--text-dim); max-width:640px; margin:0 auto;}
-.empty-state .big{font-size:34px; margin-bottom:10px;}
+.face-back{background:var(--surface-3); transform:rotateY(180deg); border-color:var(--gold);}
+.flashcard-face .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--gold-soft); letter-spacing:.06em; margin-bottom:8px; font-weight:700;}
+.flashcard-face .txt{font-size:15px; color:var(--text); line-height:1.55;}
+.flashcard-face .txt b, .flashcard-face .txt strong{color:var(--gold-soft);}
 
-/* ============ QUIZ ============ */
+.grade-row{display:flex; gap:10px; justify-content:center; max-width:640px; margin:0 auto;}
+.grade-row .btn{flex:1; justify-content:center;}
+
+.empty-state{text-align:center; padding:40px 20px; color:var(--text-muted); max-width:640px; margin:0 auto;}
+.empty-state .big{font-size:40px; margin-bottom:10px;}
+
+/* ---------- QUIZ ---------- */
 .quiz-setup{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;}
-.quiz-card{max-width:660px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:22px 24px; box-shadow:var(--shadow);}
-.quiz-progress{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--text-dim); margin-bottom:10px;}
-.quiz-q{font-size:15px; margin-bottom:16px; line-height:1.55;}
+.quiz-card{max-width:680px; margin:0 auto; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:24px 26px; box-shadow:var(--shadow);}
+.quiz-progress, .quiz-meta{display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-dim); font-family:'IBM Plex Mono',monospace; margin-bottom:10px;}
+.quiz-q{font-size:15.5px; margin-bottom:16px; color:var(--text);}
+.quiz-q table.mini{margin:12px 0 0;}
 .opt{
-  display:flex; gap:10px; align-items:flex-start; width:100%; text-align:left; background:var(--bg);
-  border:1px solid var(--border); border-radius:var(--radius); padding:12px 14px; margin-bottom:9px; cursor:pointer; font-size:13.5px;
+  display:flex; align-items:flex-start; gap:10px; padding:12px 14px; border:1px solid var(--border);
+  border-radius:9px; margin-bottom:9px; cursor:pointer; transition:all .15s; background:var(--surface-2);
+  width:100%; text-align:left; font-size:13.5px; font-family:'Inter',sans-serif; color:var(--text);
 }
 .opt:hover:not(:disabled){border-color:var(--gold);}
 .opt .oletter{font-family:'IBM Plex Mono',monospace; font-weight:700; color:var(--gold-soft); flex-shrink:0;}
-.opt.correct{background:rgba(46,111,82,0.12); border-color:var(--green); color:var(--green); font-weight:600;}
-.opt.wrong{background:rgba(164,63,38,0.1); border-color:var(--rust); color:var(--rust); font-weight:600;}
-.opt:disabled{cursor:default;}
-.quiz-exp{background:var(--surface-2); border-radius:var(--radius); padding:13px 15px; margin-top:6px; font-size:13.5px; color:var(--text-muted);}
-.quiz-exp .lbl{font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; color:var(--text-dim); margin-bottom:5px; display:block; font-weight:600;}
+.opt.correct{background:rgba(74,122,105,.18); border-color:var(--green);}
+.opt.wrong{background:rgba(162,73,46,.18); border-color:var(--rust);}
+.opt:disabled{cursor:default; pointer-events:none;}
+.quiz-exp{background:var(--surface-2); border-left:3px solid var(--blue); border-radius:0 var(--radius) var(--radius) 0; padding:13px 15px; margin-top:14px; font-size:13.3px; color:var(--text-muted);}
+.quiz-exp .lbl{font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); margin-bottom:5px; display:block;}
+.quiz-exp b{color:var(--text);}
 .quiz-score{font-family:'IBM Plex Mono',monospace; font-weight:700; color:var(--gold-soft);}
 .wronglist{display:flex; flex-direction:column; gap:8px; margin:14px 0;}
-.wronglist .wl-item{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:10px 13px; font-size:13px;}
+.wronglist .wl-item{background:var(--surface-2); border-radius:var(--radius); padding:12px 14px; margin-bottom:0; text-align:left; font-size:13px; color:var(--text-muted);}
 
-/* ============ PRACTICE ============ */
-.practice-card{max-width:720px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px 24px; margin-bottom:20px; box-shadow:var(--shadow);}
+/* ---------- PRACTICE ---------- */
+.practice-card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:22px 24px; margin-bottom:20px; max-width:720px; box-shadow:none;}
 .ph{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;}
-.ph h3{display:inline; font-size:15.5px; margin-left:8px;}
-.done-check{font-size:12px; color:var(--text-dim); display:flex; align-items:center; gap:6px; cursor:pointer;}
-.practice-scenario{font-size:13.5px; color:var(--text-muted); margin-bottom:10px; line-height:1.6;}
-.practice-scenario table{margin:10px 0;}
-.practice-scenario .table-scroll{overflow-x:auto; margin:10px 0;}
-.practice-scenario .table-scroll table{margin:0; min-width:520px;}
-.practice-card details{background:var(--bg); border:1px solid var(--border); border-radius:8px; margin-bottom:8px; padding:9px 13px;}
-.practice-card summary{cursor:pointer; font-size:12.5px; font-weight:600; color:var(--gold-soft); font-family:'IBM Plex Mono',monospace;}
-.practice-card details[open] summary{margin-bottom:8px;}
-.practice-card details .step-body{font-size:13.5px; color:var(--text-muted); line-height:1.6;}
-.practice-final{background:var(--surface-3); color:#fff; border-radius:8px; padding:11px 14px; font-weight:600; font-size:13.5px; margin-top:8px; font-family:'IBM Plex Mono',monospace;}
+.ph h3{font-size:16px; display:inline; margin-left:8px;}
+.done-check{display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--text-muted); cursor:pointer;}
+.practice-scenario{background:var(--surface-2); border-radius:var(--radius); padding:13px 15px; margin-bottom:12px; font-size:13.8px; color:var(--text-muted); line-height:1.6;}
+.practice-scenario table.mini{margin-top:10px;}
+.practice-card details{background:var(--surface-2); border-radius:8px; margin-bottom:8px; padding:10px 14px;}
+.practice-card summary{cursor:pointer; font-weight:600; font-size:13.3px; color:var(--gold-soft); outline:none; font-family:'IBM Plex Mono',monospace;}
+.practice-card details > .step-body{margin-top:10px; font-size:13.5px; color:var(--text-muted); padding-top:10px; border-top:1px dashed var(--border); line-height:1.6;}
+.practice-card details .formula-box{margin:8px 0;}
+.practice-final{background:rgba(163,130,40,.14); border:1px solid var(--gold); border-radius:var(--radius); padding:11px 15px; margin-top:10px; font-weight:600; font-size:13.8px; color:var(--gold-soft);}
 
-/* ============ ILLUSTRATIONS (shared) ============ */
-.illus-block{max-width:720px; margin:20px 0 26px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px 22px;}
-.illus-title{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--text-dim); margin-bottom:14px; font-weight:600;}
+/* ---------- Illustrations (generic building blocks, from R18) ---------- */
+.wf-step{display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-radius:8px; margin-bottom:6px; font-family:'IBM Plex Mono',monospace; font-size:13px;}
+.wf-step .lbl{font-family:'Inter',sans-serif; font-weight:500;}
+.wf-step.base{background:var(--surface-3); font-weight:700;}
+.wf-step.plus{background:rgba(74,122,105,.14);}
+.wf-step.minus{background:rgba(162,73,46,.14);}
+.wf-step.result{background:var(--gold); color:var(--text); font-weight:700;}
+.waterfall{max-width:520px; margin:14px auto;}
 
-/* value-card / ratio-card grid */
-.ratio-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
-.ratio-card{background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px;}
-.ratio-card.hi{border-color:var(--gold); box-shadow:0 0 0 1px var(--gold);}
-.ratio-card .rname{font-weight:700; font-size:13.5px; color:var(--gold-soft); margin-bottom:4px;}
-.ratio-card .rformula{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--text-muted); margin-bottom:8px;}
-.ratio-card .ruse{font-size:12px; color:var(--text-dim); border-top:1px dashed var(--border); padding-top:8px; margin-top:8px;}
+.value-card{background:var(--surface-2); border-radius:var(--radius); padding:15px 16px; border:1px solid var(--border);}
+.value-card.hi{border-color:var(--gold); box-shadow:0 0 0 1px var(--gold);}
+.value-card .vic{font-size:20px; margin-bottom:6px;}
+.value-card h5{margin:0 0 6px; font-size:13.8px; color:var(--text);}
+.value-card p{font-size:12.5px; color:var(--text-muted); margin:0;}
+.value-card .ruse{font-size:12px; color:var(--text-dim); border-top:1px dashed var(--border); padding-top:8px; margin-top:8px;}
+.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:16px 0;}
+.grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:16px 0;}
 
-/* waterfall */
-.waterfall{display:flex; flex-direction:column; gap:6px; max-width:520px; margin:14px auto;}
-.wf-step{display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-radius:8px; font-size:13px; font-family:'IBM Plex Mono',monospace;}
-.wf-step.base{background:var(--surface-3); color:#fff; font-weight:600;}
-.wf-step.plus{background:rgba(46,111,82,0.12); color:var(--green);}
-.wf-step.minus{background:rgba(164,63,38,0.1); color:var(--rust);}
-.wf-step.result{background:var(--gold); color:#fff; font-weight:700;}
-
-/* steps flow */
-.steps-flow{display:flex; align-items:stretch; gap:0; margin:16px 0; flex-wrap:wrap;}
-.step-node{flex:1; min-width:130px; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:12px 13px; text-align:center;}
-.step-node .sn-num{width:22px; height:22px; border-radius:50%; background:var(--gold); color:#fff; font-size:11.5px; font-weight:700; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; font-family:'IBM Plex Mono',monospace;}
-.step-node .sn-txt{font-size:12px; color:var(--text-muted); line-height:1.4;}
-.step-connector{display:flex; align-items:center; justify-content:center; width:28px; color:var(--gold); font-size:16px; flex-shrink:0;}
-@media (max-width:860px){
-  .steps-flow{flex-direction:column;}
-  .step-connector{width:auto; height:20px; transform:rotate(90deg);}
-}
-
-/* toggle explorer (2-state) */
-.toggle-row{display:flex; gap:8px; justify-content:center; margin-bottom:14px;}
-.toggle-btn{font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; padding:7px 16px; border-radius:20px; border:1px solid var(--border); background:var(--bg); color:var(--text-muted); cursor:pointer;}
-.toggle-btn.active{background:var(--gold); color:#fff; border-color:var(--gold);}
-
-/* comparison columns */
-.compare-cols{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
-.compare-col{background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px;}
-.compare-col h5{margin:0 0 8px; font-size:13px; color:var(--gold-soft);}
-.compare-col ul{margin:0; padding-left:18px; font-size:12.5px;}
+/* ---------- New: compare-cols (pros/cons, 2-column) — R18-styled extension ---------- */
+.compare-cols{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:16px 0;}
+.compare-col{background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px;}
+.compare-col h5{margin:0 0 8px; font-size:13.3px; color:var(--gold-soft); font-family:'Roboto Slab',serif;}
+.compare-col ul{margin:0; padding-left:18px; font-size:12.5px; color:var(--text-muted);}
 .compare-col li{margin-bottom:6px;}
 
-/* criteria list */
+/* ---------- New: steps-flow (sequential process) — R18-styled extension ---------- */
+.steps-flow{display:flex; align-items:stretch; gap:0; margin:16px 0; flex-wrap:wrap;}
+.step-node{flex:1; min-width:130px; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius); padding:12px 13px; text-align:center;}
+.step-node .sn-num{width:22px; height:22px; border-radius:50%; background:var(--gold); color:var(--text); font-size:11.5px; font-weight:700; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; font-family:'IBM Plex Mono',monospace;}
+.step-node .sn-txt{font-size:12px; color:var(--text-muted); line-height:1.4;}
+.step-connector{display:flex; align-items:center; justify-content:center; width:28px; color:var(--gold); font-size:16px; flex-shrink:0;}
+
+/* ---------- New: criteria-list (numbered checklist) — R18-styled extension ---------- */
 .criteria-list{display:flex; flex-direction:column; gap:10px; margin:14px 0;}
 .criteria-item{display:flex; gap:12px; align-items:flex-start;}
-.cnum{width:24px; height:24px; border-radius:50%; background:var(--gold); color:#fff; font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;}
-.criteria-item .ctxt{font-size:13.5px;}
-.criteria-item .ctxt b{display:block; margin-bottom:2px;}
+.cnum{width:24px; height:24px; border-radius:50%; background:var(--gold); color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;}
+.criteria-item .ctxt{font-size:13.5px; color:var(--text-muted);}
+.criteria-item .ctxt b{display:block; margin-bottom:2px; color:var(--text);}
 
-/* gauge / scale */
-.scale-track{position:relative; height:10px; background:linear-gradient(90deg, var(--green-soft), var(--surface-2) 50%, var(--rust-soft)); border-radius:6px; margin:22px 0 8px;}
-.scale-marker{position:absolute; top:-9px; width:3px; height:28px; background:var(--text); border-radius:2px;}
-.scale-labels{display:flex; justify-content:space-between; font-size:11px; color:var(--text-dim);}
+/* ---------- constraint-bars (from R18) — reused for mean/ratio comparisons ---------- */
+.constraint-bars{margin:16px 0;}
+.cbar-row{margin-bottom:14px;}
+.cbar-label{display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:5px; color:var(--text-muted);}
+.cbar-track{background:var(--surface-2); border-radius:20px; height:22px; overflow:hidden;}
+.cbar-fill{height:100%; border-radius:20px; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:700; color:#fff; font-family:'IBM Plex Mono',monospace;}
 
-/* bars (mean comparison, quality bars etc) */
-.bar-chart{display:flex; align-items:flex-end; gap:16px; height:170px; margin:18px 0 6px; padding:0 6px;}
-.bar-col{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%;}
-.bar-col .bv{font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; color:var(--text-muted); margin-bottom:6px;}
-.bar-col .bar{width:60%; background:var(--gold); border-radius:5px 5px 0 0;}
-.bar-col .bl{font-size:11px; color:var(--text-dim); margin-top:7px; text-align:center;}
+/* ---------- pe-scale (from R18) — reused for the cross-border impact scale ---------- */
+.pe-scale{display:flex; align-items:center; gap:10px; margin:14px 0;}
+.pe-scale .track{flex:1; height:8px; border-radius:6px; background:var(--surface-2); position:relative;}
+.pe-scale .marker{position:absolute; top:-6px; width:20px; height:20px; border-radius:50%; background:var(--gold); border:2px solid var(--bg); transform:translateX(-50%); font-size:9px; display:flex; align-items:center; justify-content:center; color:var(--text); font-weight:700; font-family:'IBM Plex Mono',monospace;}
+.pe-scale .track-labels{display:flex; justify-content:space-between; font-size:11px; color:var(--text-dim); margin-top:18px;}
 
-/* app-grid style feature cards */
+/* ---------- app-grid (feature list, no icon size distinction from value-card) ---------- */
 .app-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:16px 0;}
-.app-card{background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:13px 15px;}
-.app-card .aic{font-size:18px; margin-bottom:6px;}
-.app-card .at{font-weight:600; font-size:13px; margin-bottom:3px;}
-.app-card .ad{font-size:12px; color:var(--text-dim); line-height:1.45;}
+.illus-caption{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--text-dim); font-weight:600; margin:18px 0 8px;}
 
-@media (max-width:860px){
-  #app{flex-direction:column; max-width:100%;}
-  .sidebar{width:100%; height:auto; position:relative; top:auto;}
-  .main{padding:20px 16px 70px;}
-  .ratio-grid{grid-template-columns:1fr;}
-  .compare-cols{grid-template-columns:1fr;}
-  .app-grid{grid-template-columns:1fr;}
+/* ---------- Responsive ---------- */
+@media (max-width: 860px){
+  #app{display:block; max-width:100%;}
+  .sidebar{position:relative; width:100%; height:auto; top:auto; border-right:none; border-bottom:1px solid var(--border);}
+  .main{padding:20px 16px 60px;}
   .stat-grid{grid-template-columns:repeat(2,1fr);}
-  .flashcard{height:260px;}
+  .grid-2, .grid-3, .compare-cols, .app-grid{grid-template-columns:1fr;}
+  .section-title{font-size:21px;}
+  .flashcard{height:280px;}
+  .quiz-card{padding:18px 16px;}
+  .practice-card{padding:16px 14px;}
+  .steps-flow{flex-direction:column;}
+  .step-connector{width:auto; height:20px; transform:rotate(90deg);}
+  table.mini, table.dtable.wide-table{
+    display:block; overflow-x:auto; white-space:nowrap; -webkit-overflow-scrolling:touch;
+  }
 }
 </style>
 </head>
 <body>
 <div id="app">
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
     <div class="brand">
-      <div class="brand-mark">
-        <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M4 24L11 8L15 17L19 6L26 24" stroke="#A38228" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
-          <circle cx="11" cy="8" r="1.6" fill="#A38228"/>
-          <circle cx="19" cy="6" r="1.6" fill="#A38228"/>
-        </svg>
-      </div>
+      <svg class="brand-mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 6V32" stroke="var(--gold)" stroke-width="1.6" stroke-linecap="round"/>
+        <path d="M8 10H32" stroke="var(--gold)" stroke-width="1.6" stroke-linecap="round"/>
+        <path d="M20 6L15 10M20 6L25 10" stroke="var(--gold)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M8 10L4 20A4 4 0 0 0 12 20L8 10Z" stroke="var(--gold)" stroke-width="1.4" stroke-linejoin="round"/>
+        <path d="M32 10L28 20A4 4 0 0 0 36 20L32 10Z" stroke="var(--gold)" stroke-width="1.4" stroke-linejoin="round"/>
+        <path d="M13 34H27" stroke="var(--gold)" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
       <div>
-        <div class="brand-eyebrow">CFA LEVEL II · EQUITY</div>
-        <div class="brand-title">R20 — Market-Based Valuation: Price &amp; EV Multiples</div>
+        <div class="brand-eyebrow">CFA Level II · Equity</div>
+        <div class="brand-name">R20 · Market-Based<br>Valuation: Multiples</div>
       </div>
     </div>
-    <div class="sidebar-stats">
-      <div class="stat-chip"><div class="v" id="mastery-pct">0%</div><div class="l">Mastered</div></div>
-      <div class="stat-chip"><div class="v" id="due-count">0</div><div class="l">Due for review</div></div>
-    </div>
-    <div class="sync-line"><span class="sync-dot" id="sync-dot"></span><span id="sync-status">Connecting…</span></div>
 
-    <div class="nav-group-label">Start here</div>
-    <button class="nav-item" data-view="overview">🗺️ Overview &amp; roadmap</button>
+    <div class="sidebar-stats">
+      <div class="stat-chip"><div class="v" id="stat-mastery">0%</div><div class="l">Mastered</div></div>
+      <div class="stat-chip"><div class="v" id="stat-due">0</div><div class="l">Due for review</div></div>
+    </div>
+    <div class="sync-line" id="sync-line">Firebase: <span id="sync-status">connecting…</span></div>
+
+    <div class="nav-group-label">Overview</div>
+    <button class="nav-item" data-view="overview"><span class="dot" id="dot-overview"></span>Overview</button>
 
     <div class="nav-group-label">Module 20.1 — P/E Multiple</div>
-    <button class="nav-item" data-view="a"><span class="mastery-dot" data-sec="a"></span>LOS 20.a — Comparables vs. fundamentals<span class="code">a</span></button>
-    <button class="nav-item" data-view="b"><span class="mastery-dot" data-sec="b"></span>LOS 20.b — Justified price multiple<span class="code">b</span></button>
+    <button class="nav-item" data-view="a"><span class="dot" id="dot-a"></span><span class="los-code">20.a</span> Comparables vs. Fundamentals</button>
+    <button class="nav-item" data-view="b"><span class="dot" id="dot-b"></span><span class="los-code">20.b</span> Justified Price Multiple</button>
 
-    <div class="nav-group-label">Rationales &amp; formulas (all ratios)</div>
-    <button class="nav-item" data-view="c"><span class="mastery-dot" data-sec="c"></span>LOS 20.c — Rationales &amp; drawbacks<span class="code">c</span></button>
-    <button class="nav-item" data-view="d"><span class="mastery-dot" data-sec="d"></span>LOS 20.d — Calculating the ratios<span class="code">d</span></button>
+    <div class="nav-group-label">Rationales &amp; Formulas (All Ratios)</div>
+    <button class="nav-item" data-view="c"><span class="dot" id="dot-c"></span><span class="los-code">20.c</span> Rationales &amp; Drawbacks</button>
+    <button class="nav-item" data-view="d"><span class="dot" id="dot-d"></span><span class="los-code">20.d</span> Calculating the Ratios</button>
 
-    <div class="nav-group-label">Module 20.4 — Earnings quality</div>
-    <button class="nav-item" data-view="e"><span class="mastery-dot" data-sec="e"></span>LOS 20.e — Underlying &amp; normalized EPS<span class="code">e</span></button>
-    <button class="nav-item" data-view="f"><span class="mastery-dot" data-sec="f"></span>LOS 20.f — Earnings yield (E/P)<span class="code">f</span></button>
+    <div class="nav-group-label">Module 20.4 — Earnings Quality</div>
+    <button class="nav-item" data-view="e"><span class="dot" id="dot-e"></span><span class="los-code">20.e</span> Underlying &amp; Normalized EPS</button>
+    <button class="nav-item" data-view="f"><span class="dot" id="dot-f"></span><span class="los-code">20.f</span> Earnings Yield (E/P)</button>
 
-    <div class="nav-group-label">Justified multiples</div>
-    <button class="nav-item" data-view="g"><span class="mastery-dot" data-sec="g"></span>LOS 20.g — Fundamental drivers<span class="code">g</span></button>
-    <button class="nav-item" data-view="h"><span class="mastery-dot" data-sec="h"></span>LOS 20.h — Predicted P/E (regression)<span class="code">h</span></button>
-    <button class="nav-item" data-view="i"><span class="mastery-dot" data-sec="i"></span>LOS 20.i — Justified P/E, P/B, P/S<span class="code">i</span></button>
-    <button class="nav-item" data-view="j"><span class="mastery-dot" data-sec="j"></span>LOS 20.j — PEG ratio<span class="code">j</span></button>
-    <button class="nav-item" data-view="k"><span class="mastery-dot" data-sec="k"></span>LOS 20.k — Multiples for terminal value<span class="code">k</span></button>
+    <div class="nav-group-label">Justified Multiples</div>
+    <button class="nav-item" data-view="g"><span class="dot" id="dot-g"></span><span class="los-code">20.g</span> Fundamental Drivers</button>
+    <button class="nav-item" data-view="h"><span class="dot" id="dot-h"></span><span class="los-code">20.h</span> Predicted P/E (Regression)</button>
+    <button class="nav-item" data-view="i"><span class="dot" id="dot-i"></span><span class="los-code">20.i</span> Justified P/E, P/B, P/S</button>
+    <button class="nav-item" data-view="j"><span class="dot" id="dot-j"></span><span class="los-code">20.j</span> PEG Ratio</button>
+    <button class="nav-item" data-view="k"><span class="dot" id="dot-k"></span><span class="los-code">20.k</span> Multiples for Terminal Value</button>
 
-    <div class="nav-group-label">Method of comparables</div>
-    <button class="nav-item" data-view="l"><span class="mastery-dot" data-sec="l"></span>LOS 20.l — Over/under/fairly valued<span class="code">l</span></button>
-    <button class="nav-item" data-view="m"><span class="mastery-dot" data-sec="m"></span>LOS 20.m — Role of fundamentals<span class="code">m</span></button>
+    <div class="nav-group-label">Method of Comparables</div>
+    <button class="nav-item" data-view="l"><span class="dot" id="dot-l"></span><span class="los-code">20.l</span> Over/Under/Fairly Valued</button>
+    <button class="nav-item" data-view="m"><span class="dot" id="dot-m"></span><span class="los-code">20.m</span> Role of Fundamentals</button>
 
-    <div class="nav-group-label">EV multiples &amp; global issues</div>
-    <button class="nav-item" data-view="n"><span class="mastery-dot" data-sec="n"></span>LOS 20.n — Cash flow definitions<span class="code">n</span></button>
-    <button class="nav-item" data-view="o"><span class="mastery-dot" data-sec="o"></span>LOS 20.o — EV multiples &amp; EV/EBITDA<span class="code">o</span></button>
-    <button class="nav-item" data-view="p"><span class="mastery-dot" data-sec="p"></span>LOS 20.p — Cross-border comparisons<span class="code">p</span></button>
-    <button class="nav-item" data-view="q"><span class="mastery-dot" data-sec="q"></span>LOS 20.q — Momentum indicators<span class="code">q</span></button>
-    <button class="nav-item" data-view="r"><span class="mastery-dot" data-sec="r"></span>LOS 20.r — Mean of a group of multiples<span class="code">r</span></button>
+    <div class="nav-group-label">EV Multiples &amp; Global Issues</div>
+    <button class="nav-item" data-view="n"><span class="dot" id="dot-n"></span><span class="los-code">20.n</span> Cash Flow Definitions</button>
+    <button class="nav-item" data-view="o"><span class="dot" id="dot-o"></span><span class="los-code">20.o</span> EV Multiples &amp; EV/EBITDA</button>
+    <button class="nav-item" data-view="p"><span class="dot" id="dot-p"></span><span class="los-code">20.p</span> Cross-Border Comparisons</button>
+    <button class="nav-item" data-view="q"><span class="dot" id="dot-q"></span><span class="los-code">20.q</span> Momentum Indicators</button>
+    <button class="nav-item" data-view="r"><span class="dot" id="dot-r"></span><span class="los-code">20.r</span> Mean of a Group of Multiples</button>
 
     <div class="nav-group-label">Practice</div>
-    <button class="nav-item" data-view="review">🔁 Spaced Review</button>
-    <button class="nav-item" data-view="quiz">📝 Module Quiz</button>
-    <button class="nav-item" data-view="practice">🧮 Practice Problems</button>
+    <button class="nav-item practice-item" data-view="review">🔁 Spaced Review</button>
+    <button class="nav-item practice-item" data-view="quiz">📝 Module Quiz</button>
+    <button class="nav-item practice-item" data-view="practice">🧮 Practice Problems</button>
   </aside>
 
   <main class="main">
     <!-- VIEWS WILL BE INSERTED HERE -->
     <div class="view active" id="view-overview">
-      <span class="los-tag">READING 20</span>
-      <h1 class="section-title">Market-Based Valuation: Price and Enterprise Value Multiples</h1>
+      <div class="module-tag">CFA Level II · Equity Investments</div>
+      <h1 class="section-title">Reading 20: Market-Based Valuation: Price and Enterprise Value Multiples</h1>
       <p class="section-sub">18 Learning Outcome Statements across 4 modules. This reading builds directly on the Gordon growth model (Reading 18) and FCFE/FCFF models (Reading 19) — every "justified multiple" formula here is just that same DCF value, algebraically rearranged into a ratio.</p>
 
-      <div class="theory">
-        <p><strong>Exam focus.</strong> This topic review covers the estimation of P/E, P/B, PEG, P/S, P/CF, and enterprise value/EBITDA ratios. The justified price multiple models draw heavily on the discounted dividend and free cash flow readings. You should be able to (1) estimate a justified price multiple for an individual firm from its fundamentals, and (2) apply the method of comparables to estimate a stock's relative value against a benchmark.</p>
-
-        <div class="callout">
-          <span class="callout-label">Two competing philosophies — hold this frame the whole reading</span>
-          <p><strong>Method of comparables:</strong> value a stock by comparing its multiple to a benchmark (peer, industry, index). Rooted in the <strong>Law of One Price</strong> — similar assets should sell at similar multiples. Purely <em>relative</em>: you can only say "over/undervalued relative to X," never "worth $Y."</p>
-          <p><strong>Method based on forecasted fundamentals:</strong> value a stock by computing what its multiple <em>should</em> be, using a DCF model (usually Gordon growth) rearranged algebraically. This gives an absolute "justified" multiple, rooted in DCF theory.</p>
+      <div class="progress-ring-wrap">
+        <div class="info">
+          <h3>Exam Focus</h3>
+          <p>This topic review covers the estimation of P/E, P/B, PEG, P/S, P/CF, and enterprise value/EBITDA ratios. The justified price multiple models draw heavily on the discounted dividend and free cash flow readings. You should be able to (1) estimate a justified price multiple for an individual firm from its fundamentals, and (2) apply the method of comparables to estimate a stock's relative value against a benchmark.</p>
         </div>
       </div>
 
-      <div class="stat-grid">
-        <div class="stat-card"><div class="v">18</div><div class="l">LOS total</div></div>
-        <div class="stat-card"><div class="v">5</div><div class="l">Price multiples covered</div></div>
-        <div class="stat-card"><div class="v">4</div><div class="l">Modules</div></div>
-        <div class="stat-card"><div class="v" id="ov-cardcount">—</div><div class="l">Flashcards</div></div>
+      <div class="callout">
+        <span class="callout-label">Two competing philosophies — hold this frame the whole reading</span>
+        <p><strong>Method of comparables:</strong> value a stock by comparing its multiple to a benchmark (peer, industry, index). Rooted in the <strong>Law of One Price</strong> — similar assets should sell at similar multiples. Purely <em>relative</em>: you can only say "over/undervalued relative to X," never "worth $Y."</p>
+        <p><strong>Method based on forecasted fundamentals:</strong> value a stock by computing what its multiple <em>should</em> be, using a DCF model (usually Gordon growth) rearranged algebraically. This gives an absolute "justified" multiple, rooted in DCF theory.</p>
       </div>
 
-      <h4 style="font-family:'Roboto Slab',serif; font-size:16px; color:var(--text); margin:26px 0 10px;">Roadmap — click any LOS to jump in</h4>
-      <div class="roadmap" id="overview-roadmap"><!-- populated by JS --></div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="v" id="ov-cards">0</div><div class="l">Flashcards</div></div>
+        <div class="stat-card"><div class="v" id="ov-quiz">0</div><div class="l">Quiz Questions</div></div>
+        <div class="stat-card"><div class="v" id="ov-practice">0</div><div class="l">Practice Problems</div></div>
+        <div class="stat-card"><div class="v">18</div><div class="l">LOS Covered</div></div>
+      </div>
+
+      <h4>Roadmap</h4>
+      <div class="roadmap" id="overview-roadmap"><!-- filled by JS --></div>
+
+      <p class="nudge"><span class="ic">💡</span><span class="nudge-text">Click any LOS above, or use the sidebar, to begin. Every theory view ends with active-recall flashcards. Press <span class="kbd">Enter</span> from any view to jump straight to the next one.</span></p>
     </div>
 
     <!-- ============ LOS 20.a ============ -->
     <div class="view" id="view-a">
-      <span class="los-tag">LOS 20.a</span><span class="module-tag">MODULE 20.1 · P/E MULTIPLE</span>
+      <div class="module-tag">Module 20.1 · P/E Multiple</div>
+      <span class="los-tag">LOS 20.a</span>
       <h1 class="section-title">Method of Comparables vs. Method of Forecasted Fundamentals</h1>
       <p class="section-sub">Contrast the two approaches to using price multiples in valuation and explain the economic rationale behind each.</p>
       <div class="theory">
         <h4>Warm-up: what is a "multiple"?</h4>
         <p>Price multiples are ratios of a stock's market price to some fundamental variable (earnings, book value, sales, cash flow). They are among the most widely used tools for valuing equities because they let an investor quickly judge whether a stock looks overvalued, undervalued, or properly valued relative to a benchmark. <strong>Enterprise value multiples</strong> relate the total value of a company — the market value of its capital from all sources — to a measure of operating earnings such as EBITDA. <strong>Momentum indicators</strong> compare a stock's price, or a company's earnings, to their own values in earlier periods.</p>
 
-        <div class="illus-block">
-          <div class="illus-title">Two philosophies, side by side</div>
-          <div class="compare-cols">
+        <p class="illus-caption">Two philosophies, side by side</p>
+        <div class="compare-cols">
             <div class="compare-col">
               <h5>Method of Comparables</h5>
               <ul>
@@ -438,7 +470,7 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
               </ul>
             </div>
           </div>
-        </div>
+        
 
         <p class="nudge"><span class="ic">💡</span><span class="nudge-text"> The two methods are not rivals you must pick between on the exam — they are two different <em>lenses</em>. The method of comparables asks "is this cheap relative to its peers?" The method of forecasted fundamentals asks "is this cheap relative to what a DCF model says it should be worth?" A stock can be cheap by one lens and expensive by the other.</span></p>
 
@@ -472,7 +504,8 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
 
     <!-- ============ LOS 20.b ============ -->
     <div class="view" id="view-b">
-      <span class="los-tag">LOS 20.b</span><span class="module-tag">MODULE 20.1 · P/E MULTIPLE</span>
+      <div class="module-tag">MODULE 20.1 · P/E MULTIPLE</div>
+      <span class="los-tag">LOS 20.b</span>
       <h1 class="section-title">Calculate and Interpret a Justified Price Multiple</h1>
       <p class="section-sub">The core interpretive rule that governs every multiple in this reading.</p>
       <div class="theory">
@@ -503,16 +536,16 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
 
     <!-- ============ LOS 20.c ============ -->
     <div class="view" id="view-c">
-      <span class="los-tag">LOS 20.c</span><span class="module-tag">MODULES 20.1–20.4</span>
+      <div class="module-tag">MODULES 20.1–20.4</div>
+      <span class="los-tag">LOS 20.c</span>
       <h1 class="section-title">Rationales and Drawbacks of the Five Price Multiples + Dividend Yield</h1>
       <p class="section-sub">Describe rationales for and possible drawbacks to using alternative price multiples and dividend yield in valuation. This LOS is tested qualitatively across all 5 ratios — memorize the pattern, not just the words.</p>
       <div class="theory">
         <p class="nudge"><span class="ic">💡</span><span class="nudge-text"> Pattern to notice: every ratio's "rationale" column praises what the denominator captures; every "drawback" column complains about how easily that same denominator can be distorted, negative, or non-comparable. Learn the pattern once and each ratio becomes easy to reconstruct.</span></p>
 
         <h4>P/E Ratio</h4>
-        <div class="illus-block">
-          <div class="illus-title">Rationale vs. drawbacks</div>
-          <div class="compare-cols">
+        <p class="illus-caption">Rationale vs. drawbacks</p>
+        <div class="compare-cols">
             <div class="compare-col">
               <h5>✅ Rationale</h5>
               <ul>
@@ -529,12 +562,11 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
               </ul>
             </div>
           </div>
-        </div>
+        
 
         <h4>P/B Ratio</h4>
-        <div class="illus-block">
-          <div class="illus-title">Rationale vs. drawbacks</div>
-          <div class="compare-cols">
+        <p class="illus-caption">Rationale vs. drawbacks</p>
+        <div class="compare-cols">
             <div class="compare-col">
               <h5>✅ Rationale</h5>
               <ul>
@@ -554,12 +586,11 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
               </ul>
             </div>
           </div>
-        </div>
+        
 
         <h4>P/S Ratio</h4>
-        <div class="illus-block">
-          <div class="illus-title">Rationale vs. drawbacks</div>
-          <div class="compare-cols">
+        <p class="illus-caption">Rationale vs. drawbacks</p>
+        <div class="compare-cols">
             <div class="compare-col">
               <h5>✅ Rationale</h5>
               <ul>
@@ -578,12 +609,11 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
               </ul>
             </div>
           </div>
-        </div>
+        
 
         <h4>P/CF Ratio</h4>
-        <div class="illus-block">
-          <div class="illus-title">Rationale vs. drawbacks</div>
-          <div class="compare-cols">
+        <p class="illus-caption">Rationale vs. drawbacks</p>
+        <div class="compare-cols">
             <div class="compare-col">
               <h5>✅ Rationale</h5>
               <ul>
@@ -601,13 +631,12 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
               </ul>
             </div>
           </div>
-        </div>
+        
 
         <h4>Dividend Yield (D/P)</h4>
         <p>The dividend yield is the ratio of the common dividend to the market price. It is most often used for <strong>valuing indexes</strong>.</p>
-        <div class="illus-block">
-          <div class="illus-title">Rationale vs. drawbacks</div>
-          <div class="compare-cols">
+        <p class="illus-caption">Rationale vs. drawbacks</p>
+        <div class="compare-cols">
             <div class="compare-col">
               <h5>✅ Rationale</h5>
               <ul>
@@ -623,7 +652,7 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
               </ul>
             </div>
           </div>
-        </div>
+        
       </div>
 
       <div class="deck-block">
@@ -634,7 +663,8 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
 
     <!-- ============ LOS 20.d ============ -->
     <div class="view" id="view-d">
-      <span class="los-tag">LOS 20.d</span><span class="module-tag">MODULES 20.1–20.4</span>
+      <div class="module-tag">MODULES 20.1–20.4</div>
+      <span class="los-tag">LOS 20.d</span>
       <h1 class="section-title">Calculating the Five Price Multiples and Dividend Yield</h1>
       <p class="section-sub">Calculate and interpret alternative price multiples and dividend yield — trailing and leading variants, and the mechanics behind each ratio.</p>
       <div class="theory">
@@ -716,7 +746,8 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
 
     <!-- ============ LOS 20.e ============ -->
     <div class="view" id="view-e">
-      <span class="los-tag">LOS 20.e</span><span class="module-tag">MODULE 20.4</span>
+      <div class="module-tag">MODULE 20.4</div>
+      <span class="los-tag">LOS 20.e</span>
       <h1 class="section-title">Underlying Earnings and Normalized EPS</h1>
       <p class="section-sub">Calculate and interpret underlying earnings, explain methods of normalizing EPS, and calculate normalized EPS.</p>
       <div class="theory">
@@ -734,24 +765,24 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
 
         <h4>Normalized earnings</h4>
         <p><strong>Normalized earnings</strong> are an estimate of EPS at the <strong>middle of the business cycle</strong> — what the company would earn under mid-cycle, "normal" conditions. Two methods:</p>
-        <div class="ratio-grid">
-          <div class="ratio-card">
-            <div class="rname">Method of historical average EPS</div>
-            <div class="rformula">average EPS over the most recent full business cycle</div>
-            <div class="ruse">Simple, but does not adjust for changes in firm size over the cycle.</div>
+        <div class="grid-2">
+          <div class="value-card">
+            <h5>Method of historical average EPS</h5>
+            <p style="font-family:'IBM Plex Mono',monospace; font-size:12px; margin-bottom:8px;">average EPS over the most recent full business cycle</p>
+            <p class="ruse">Simple, but does not adjust for changes in firm size over the cycle.</p>
           </div>
-          <div class="ratio-card hi">
-            <div class="rname">Method of average ROE</div>
-            <div class="rformula">normalized EPS = average ROE × current BVPS</div>
-            <div class="ruse">Preferred — reliance on current BVPS reflects the effect of firm-size changes more accurately than the historical-average-EPS method.</div>
+          <div class="value-card hi">
+            <h5>Method of average ROE</h5>
+            <p style="font-family:'IBM Plex Mono',monospace; font-size:12px; margin-bottom:8px;">normalized EPS = average ROE × current BVPS</p>
+            <p class="ruse">Preferred — reliance on current BVPS reflects the effect of firm-size changes more accurately than the historical-average-EPS method.</p>
           </div>
         </div>
 
         <div class="callout"><span class="callout-label">Worked example — Magnolia Enterprises (normalized earnings)</span>
-        <div class="table-scroll"><table class="mini"><tr><th>Year</th><th>20X1</th><th>20X2</th><th>20X3</th><th>20X4</th></tr>
+        <table class="mini"><tr><th>Year</th><th>20X1</th><th>20X2</th><th>20X3</th><th>20X4</th></tr>
         <tr><td>EPS</td><td>C$4.20</td><td>C$3.75</td><td>C$4.75</td><td>C$4.30</td></tr>
         <tr><td>BVPS</td><td>C$26.02</td><td>C$27.78</td><td>C$29.25</td><td>C$32.29</td></tr>
-        <tr><td>ROE</td><td>14.0%</td><td>12.0%</td><td>16.0%</td><td>14.0%</td></tr></table></div></div>
+        <tr><td>ROE</td><td>14.0%</td><td>12.0%</td><td>16.0%</td><td>14.0%</td></tr></table></div>
         <div class="formula-box">
           <div class="eq">historical-average-EPS method = (4.20+3.75+4.75+4.30)/4 = <strong>C$4.25</strong></div>
           <div class="eq" style="margin-top:10px;">average ROE = (0.14+0.12+0.16+0.14)/4 = 14.00%</div>
@@ -772,7 +803,8 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
 
     <!-- ============ LOS 20.f ============ -->
     <div class="view" id="view-f">
-      <span class="los-tag">LOS 20.f</span><span class="module-tag">MODULE 20.4</span>
+      <div class="module-tag">MODULE 20.4</div>
+      <span class="los-tag">LOS 20.f</span>
       <h1 class="section-title">Earnings Yield (E/P)</h1>
       <p class="section-sub">Explain and justify the use of earnings yield.</p>
       <div class="theory">
@@ -795,7 +827,8 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
 
     <!-- ============ LOS 20.g ============ -->
     <div class="view" id="view-g">
-      <span class="los-tag">LOS 20.g</span><span class="module-tag">MODULE 20.4</span>
+      <div class="module-tag">MODULE 20.4</div>
+      <span class="los-tag">LOS 20.g</span>
       <h1 class="section-title">Fundamental Factors That Influence the Multiples</h1>
       <p class="section-sub">Describe fundamental factors that influence alternative price multiples and dividend yield — the directional relationships you must know cold.</p>
       <div class="theory">
@@ -832,7 +865,8 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
 
     <!-- ============ LOS 20.h ============ -->
     <div class="view" id="view-h">
-      <span class="los-tag">LOS 20.h</span><span class="module-tag">MODULE 20.4</span>
+      <div class="module-tag">MODULE 20.4</div>
+      <span class="los-tag">LOS 20.h</span>
       <h1 class="section-title">Predicted P/E from a Cross-Sectional Regression</h1>
       <p class="section-sub">Calculate and interpret a predicted P/E given a cross-sectional regression on fundamentals, and explain limitations of the methodology.</p>
       <div class="theory">
@@ -865,7 +899,8 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
 
     <!-- ============ LOS 20.i ============ -->
     <div class="view" id="view-i">
-      <span class="los-tag">LOS 20.i</span><span class="module-tag">MODULE 20.4</span>
+      <div class="module-tag">MODULE 20.4</div>
+      <span class="los-tag">LOS 20.i</span>
       <h1 class="section-title">Justified P/E, P/B, and P/S Based on Forecasted Fundamentals</h1>
       <p class="section-sub">The heart of the reading — deriving each justified multiple algebraically from the Gordon growth model.</p>
       <div class="theory">
@@ -927,7 +962,8 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
 
     <!-- ============ LOS 20.j ============ -->
     <div class="view" id="view-j">
-      <span class="los-tag">LOS 20.j</span><span class="module-tag">MODULE 20.4</span>
+      <div class="module-tag">MODULE 20.4</div>
+      <span class="los-tag">LOS 20.j</span>
       <h1 class="section-title">The P/E-to-Growth (PEG) Ratio</h1>
       <p class="section-sub">Calculate and interpret PEG and explain its use in relative valuation.</p>
       <div class="theory">
@@ -961,23 +997,24 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
 
     <!-- ============ LOS 20.k ============ -->
     <div class="view" id="view-k">
-      <span class="los-tag">LOS 20.k</span><span class="module-tag">MODULE 20.4</span>
+      <div class="module-tag">MODULE 20.4</div>
+      <span class="los-tag">LOS 20.k</span>
       <h1 class="section-title">Price Multiples for Terminal Value in a Multistage DCF</h1>
       <p class="section-sub">Calculate and explain the use of price multiples in determining terminal value in a multistage DCF model.</p>
       <div class="theory">
         <p>A terminal value at the end of the explicit forecast horizon should reflect the growth the firm can sustain <strong>over the long run</strong> beyond that point. Analysts often use terminal price multiples (P/E, P/B, P/S, P/CF) instead of a perpetuity-growth formula. Regardless of which ratio, the logic is the same:</p>
         <div class="formula-box"><div class="eq">terminal value = price multiple × fundamental variable</div></div>
 
-        <div class="ratio-grid">
-          <div class="ratio-card">
-            <div class="rname">Based on fundamentals</div>
-            <div class="rformula">= justified price multiple × forecast of the fundamental variable</div>
-            <div class="ruse">Requires estimates of growth rate, required return, and payout ratio. Weakness: needs many inputs, each a source of estimation error.</div>
+        <div class="grid-2">
+          <div class="value-card">
+            <h5>Based on fundamentals</h5>
+            <p style="font-family:'IBM Plex Mono',monospace; font-size:12px; margin-bottom:8px;">= justified price multiple × forecast of the fundamental variable</p>
+            <p class="ruse">Requires estimates of growth rate, required return, and payout ratio. Weakness: needs many inputs, each a source of estimation error.</p>
           </div>
-          <div class="ratio-card hi">
-            <div class="rname">Based on comparables</div>
-            <div class="rformula">= benchmark price multiple × forecast of the fundamental variable</div>
-            <div class="ruse">Strength: uses market data exclusively. Weakness: a benchmark that is itself mispriced transfers that error straight into your terminal value.</div>
+          <div class="value-card hi">
+            <h5>Based on comparables</h5>
+            <p style="font-family:'IBM Plex Mono',monospace; font-size:12px; margin-bottom:8px;">= benchmark price multiple × forecast of the fundamental variable</p>
+            <p class="ruse">Strength: uses market data exclusively. Weakness: a benchmark that is itself mispriced transfers that error straight into your terminal value.</p>
           </div>
         </div>
         <div class="formula-box">
@@ -999,7 +1036,8 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
 
     <!-- ============ LOS 20.l ============ -->
     <div class="view" id="view-l">
-      <span class="los-tag">LOS 20.l</span><span class="module-tag">METHOD OF COMPARABLES</span>
+      <div class="module-tag">METHOD OF COMPARABLES</div>
+      <span class="los-tag">LOS 20.l</span>
       <h1 class="section-title">Evaluating Over-, Fairly, or Undervalued via Comparisons of Multiples</h1>
       <p class="section-sub">Evaluate whether a stock is overvalued, fairly valued, or undervalued based on comparisons of multiples.</p>
       <div class="theory">
@@ -1026,10 +1064,10 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
         </ul>
 
         <div class="callout"><span class="callout-label">Worked example — Allbright Interiors vs. Basic Designs</span>
-        <div class="table-scroll"><table class="mini"><tr><th></th><th>Trailing P/E</th><th>Leading P/E</th><th>5-yr growth</th><th>Beta</th></tr>
+        <table class="mini"><tr><th></th><th>Trailing P/E</th><th>Leading P/E</th><th>5-yr growth</th><th>Beta</th></tr>
         <tr><td>Allbright</td><td>10.0</td><td>8.7</td><td>11.0%</td><td>1.3</td></tr>
         <tr><td>Basic Designs</td><td>14.0</td><td>12.7</td><td>9.0%</td><td>1.4</td></tr>
-        <tr><td>Peer median</td><td>13.3</td><td>12.1</td><td>11.0%</td><td>1.3</td></tr></table></div></div>
+        <tr><td>Peer median</td><td>13.3</td><td>12.1</td><td>11.0%</td><td>1.3</td></tr></table></div>
         <div class="formula-box"><div class="fdef">
           <div><b>Allbright:</b> P/E below the peer median (10.0 vs 13.3) despite a <em>comparable</em> growth rate (11.0% vs 11.0%) and beta (1.3 vs 1.3) → since the fundamentals match the benchmark but the multiple doesn't, Allbright appears genuinely <b>undervalued</b>.</div>
           <div style="margin-top:8px;"><b>Basic Designs:</b> P/E above the peer median (14.0 vs 13.3) despite <em>lower</em> growth (9.0% vs 11.0%) and <em>higher</em> risk (beta 1.4 vs 1.3) — both factors that should <em>lower</em> its justified P/E, not raise it. This makes Basic Designs look <b>overvalued</b> relative to the benchmark.</div>
@@ -1048,7 +1086,8 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
 
     <!-- ============ LOS 20.m ============ -->
     <div class="view" id="view-m">
-      <span class="los-tag">LOS 20.m</span><span class="module-tag">METHOD OF COMPARABLES</span>
+      <div class="module-tag">METHOD OF COMPARABLES</div>
+      <span class="los-tag">LOS 20.m</span>
       <h1 class="section-title">The Role of Fundamentals in the Method of Comparables</h1>
       <p class="section-sub">Evaluate a stock by the method of comparables and explain the importance of fundamentals in using it.</p>
       <div class="theory">
@@ -1066,9 +1105,9 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
 
         <div class="callout"><span class="callout-label">Worked example — Crisco Systems &amp; Soothsayer vs. industry peers</span>
         <p>Crisco (Networking Products industry): P/B 4.45, P/S 6.60. Soothsayer (Enterprise Software/Services industry): P/B 10.04, P/S 6.71.</p>
-        <div class="table-scroll"><table class="mini"><tr><th>Peer group</th><th>Mean P/B</th><th>Median P/B</th><th>Mean P/S</th><th>Median P/S</th></tr>
+        <table class="mini"><tr><th>Peer group</th><th>Mean P/B</th><th>Median P/B</th><th>Mean P/S</th><th>Median P/S</th></tr>
         <tr><td>Networking Products</td><td>2.065</td><td>1.170</td><td>3.733</td><td>0.900</td></tr>
-        <tr><td>Enterprise Software/Svcs</td><td>7.866</td><td>2.770</td><td>3.341</td><td>1.920</td></tr></table></div></div>
+        <tr><td>Enterprise Software/Svcs</td><td>7.866</td><td>2.770</td><td>3.341</td><td>1.920</td></tr></table></div>
         <div class="formula-box"><div class="fdef">
           <div><b>Crisco:</b> P/B (4.45) exceeds both peer mean (2.065) and median (1.170); P/S (6.60) exceeds both peer mean (3.733) and median (0.900) → Crisco appears <b>overvalued</b> by both measures.</div>
           <div style="margin-top:8px;"><b>Soothsayer:</b> P/B (10.04) exceeds both peer mean (7.866) and median (2.770); P/S (6.71) exceeds both peer mean (3.341) and median (1.920) → Soothsayer also appears <b>overvalued</b> by both measures.</div>
@@ -1090,17 +1129,18 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
 
     <!-- ============ LOS 20.n ============ -->
     <div class="view" id="view-n">
-      <span class="los-tag">LOS 20.n</span><span class="module-tag">MODULE 20.4</span>
+      <div class="module-tag">MODULE 20.4</div>
+      <span class="los-tag">LOS 20.n</span>
       <h1 class="section-title">Alternative Definitions of Cash Flow for P/CF and EV Multiples</h1>
       <p class="section-sub">Explain alternative definitions of cash flow used in price and enterprise value multiples, and describe the limitations of each.</p>
       <div class="theory">
         <p>There are (at least) <strong>four</strong> definitions of cash flow available for the P/CF ratio — expect any one of them to appear on the exam.</p>
 
-        <div class="app-grid">
-          <div class="app-card"><div class="aic">➕</div><div class="at">1. Earnings-plus-noncash-charges (CF)</div><div class="ad">CF = net income + depreciation + amortization. <strong>Limitation:</strong> ignores noncash revenue and changes in net working capital.</div></div>
-          <div class="app-card"><div class="aic">📊</div><div class="at">2. Adjusted cash flow (adjusted CFO)</div><div class="ad">CFO from the cash flow statement, adjusted for nonrecurring items (after-tax). <strong>Limitation:</strong> US GAAP requires interest paid/received and dividends received in CFO; IFRS is more flexible (interest paid can be operating or financing; interest/dividends received can be operating or investing) — creates cross-standard comparability issues.</div></div>
-          <div class="app-card"><div class="aic">💰</div><div class="at">3. Free cash flow to equity (FCFE)</div><div class="ad">FCFE = CFO − FCInv + net borrowing. Theoretically <strong>preferred</strong> definition — but <strong>more volatile</strong> than straight cash flow.</div></div>
-          <div class="app-card"><div class="aic">🏭</div><div class="at">4. EBITDA</div><div class="ad">Earnings before interest, taxes, depreciation, amortization. A <strong>pretax, pre-interest</strong> measure — a flow to <em>both</em> equity and debt holders, so it's better suited as an indicator of <strong>total company value</strong> than of equity value alone (see LOS 20.o).</div></div>
+        <div class="grid-2">
+          <div class="value-card"><div class="vic">➕</div><h5>1. Earnings-plus-noncash-charges (CF)</h5><p>CF = net income + depreciation + amortization. <strong>Limitation:</strong> ignores noncash revenue and changes in net working capital.</p></div>
+          <div class="value-card"><div class="vic">📊</div><h5>2. Adjusted cash flow (adjusted CFO)</h5><p>CFO from the cash flow statement, adjusted for nonrecurring items (after-tax). <strong>Limitation:</strong> US GAAP requires interest paid/received and dividends received in CFO; IFRS is more flexible (interest paid can be operating or financing; interest/dividends received can be operating or investing) — creates cross-standard comparability issues.</p></div>
+          <div class="value-card"><div class="vic">💰</div><h5>3. Free cash flow to equity (FCFE)</h5><p>FCFE = CFO − FCInv + net borrowing. Theoretically <strong>preferred</strong> definition — but <strong>more volatile</strong> than straight cash flow.</p></div>
+          <div class="value-card"><div class="vic">🏭</div><h5>4. EBITDA</h5><p>Earnings before interest, taxes, depreciation, amortization. A <strong>pretax, pre-interest</strong> measure — a flow to <em>both</em> equity and debt holders, so it's better suited as an indicator of <strong>total company value</strong> than of equity value alone (see LOS 20.o).</p></div>
         </div>
 
         <div class="formula-box">
@@ -1128,7 +1168,8 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
 
     <!-- ============ LOS 20.o ============ -->
     <div class="view" id="view-o">
-      <span class="los-tag">LOS 20.o</span><span class="module-tag">MODULE 20.4</span>
+      <div class="module-tag">MODULE 20.4</div>
+      <span class="los-tag">LOS 20.o</span>
       <h1 class="section-title">Enterprise Value Multiples and EV/EBITDA</h1>
       <p class="section-sub">Calculate and interpret EV multiples and evaluate the use of EV/EBITDA.</p>
       <div class="theory">
@@ -1138,16 +1179,15 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
           <div class="fdef"><div>Rationale for subtracting cash &amp; investments: an acquirer's <em>net</em> price paid for a target would effectively be lowered by the amount of the target's liquid assets it acquires along with it.</div></div>
         </div>
 
-        <div class="illus-block">
-          <div class="illus-title">EV build-up as a waterfall (Boulevard Industries numbers, Sf millions)</div>
-          <div class="waterfall">
+        <p class="illus-caption">EV build-up as a waterfall (Boulevard Industries numbers, Sf millions)</p>
+        <div class="waterfall">
             <div class="wf-step base"><span>Market value of equity (22.50 × 40)</span><span>Sf 900.0</span></div>
             <div class="wf-step plus"><span>+ Market value of debt</span><span>Sf 137.0</span></div>
             <div class="wf-step minus"><span>− Cash &amp; marketable securities</span><span>Sf 62.3</span></div>
             <div class="wf-step minus"><span>− Investments</span><span>Sf 327.0</span></div>
             <div class="wf-step result"><span>= Enterprise Value</span><span>Sf 647.7</span></div>
           </div>
-        </div>
+        
         <div class="callout"><span class="callout-label">Professor's note</span><p>Assume minority interest and preferred equity are zero unless the problem states otherwise — this is the typical exam setup. If given values for either, include them.</p></div>
 
         <div class="formula-box">
@@ -1159,19 +1199,19 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
           </div>
         </div>
 
-        <div class="ratio-grid">
-          <div class="ratio-card hi">
-            <div class="rname">✅ EV/EBITDA is useful when…</div>
-            <div class="ruse">• More useful than P/E when comparing firms with different degrees of <strong>financial leverage</strong>.<br>• Useful for valuing <strong>capital-intensive</strong> businesses with high D&amp;A.<br>• EBITDA is <strong>usually positive</strong> even when EPS is not.</div>
+        <div class="grid-2">
+          <div class="value-card hi">
+            <h5>✅ EV/EBITDA is useful when…</h5>
+            <p style="margin:0;">• More useful than P/E when comparing firms with different degrees of <strong>financial leverage</strong>.<br>• Useful for valuing <strong>capital-intensive</strong> businesses with high D&amp;A.<br>• EBITDA is <strong>usually positive</strong> even when EPS is not.</p>
           </div>
-          <div class="ratio-card">
-            <div class="rname">⚠️ Drawbacks</div>
-            <div class="ruse">• If working capital is growing, EBITDA will <strong>overstate CFO</strong>; ignores how revenue-recognition policy affects CFO.<br>• FCFF captures capex, so it's more strongly linked to valuation theory than EBITDA — EBITDA is adequate only if <strong>capex ≈ depreciation</strong>.</div>
+          <div class="value-card">
+            <h5>⚠️ Drawbacks</h5>
+            <p style="margin:0;">• If working capital is growing, EBITDA will <strong>overstate CFO</strong>; ignores how revenue-recognition policy affects CFO.<br>• FCFF captures capex, so it's more strongly linked to valuation theory than EBITDA — EBITDA is adequate only if <strong>capex ≈ depreciation</strong>.</p>
           </div>
         </div>
 
         <div class="callout"><span class="callout-label">Worked example — Boulevard Industries (Sf = Swiss francs)</span>
-        <div class="table-scroll"><table class="mini"><tr><td>Recent share price</td><td>Sf 22.50</td></tr><tr><td>Shares outstanding</td><td>40 million</td></tr><tr><td>Market value of debt</td><td>Sf 137 million</td></tr><tr><td>Cash &amp; marketable securities</td><td>Sf 62.3 million</td></tr><tr><td>Investments</td><td>Sf 327 million</td></tr><tr><td>Net income</td><td>Sf 137.5 million</td></tr><tr><td>Interest expense</td><td>Sf 6.9 million</td></tr><tr><td>D&amp;A</td><td>Sf 10.4 million</td></tr><tr><td>Taxes</td><td>Sf 95.9 million</td></tr></table></div></div>
+        <table class="mini"><tr><td>Recent share price</td><td>Sf 22.50</td></tr><tr><td>Shares outstanding</td><td>40 million</td></tr><tr><td>Market value of debt</td><td>Sf 137 million</td></tr><tr><td>Cash &amp; marketable securities</td><td>Sf 62.3 million</td></tr><tr><td>Investments</td><td>Sf 327 million</td></tr><tr><td>Net income</td><td>Sf 137.5 million</td></tr><tr><td>Interest expense</td><td>Sf 6.9 million</td></tr><tr><td>D&amp;A</td><td>Sf 10.4 million</td></tr><tr><td>Taxes</td><td>Sf 95.9 million</td></tr></table></div>
         <div class="formula-box">
           <div class="eq">EBITDA = 137.5+6.9+95.9+10.4 = <strong>Sf 250.7M</strong></div>
           <div class="eq">EV = (22.50×40) + 137 − 62.3 − 327 = <strong>Sf 647.7M</strong></div>
@@ -1194,7 +1234,8 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
 
     <!-- ============ LOS 20.p ============ -->
     <div class="view" id="view-p">
-      <span class="los-tag">LOS 20.p</span><span class="module-tag">MODULE 20.4</span>
+      <div class="module-tag">MODULE 20.4</div>
+      <span class="los-tag">LOS 20.p</span>
       <h1 class="section-title">Sources of Differences in Cross-Border Valuation Comparisons</h1>
       <p class="section-sub">Explain why comparing multiples across countries is harder than it looks.</p>
       <div class="theory">
@@ -1202,19 +1243,24 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
 
         <div class="callout">
           <span class="callout-label">Common categories of international accounting differences</span>
-          <div class="app-grid" style="margin-top:8px;">
-            <div class="app-card"><div class="at">Goodwill</div></div>
-            <div class="app-card"><div class="at">Deferred income taxes</div></div>
-            <div class="app-card"><div class="at">Foreign exchange adjustments</div></div>
-            <div class="app-card"><div class="at">R&amp;D treatment</div></div>
-            <div class="app-card"><div class="at">Pension expense</div></div>
-            <div class="app-card"><div class="at">Tangible asset revaluations</div></div>
+          <div class="grid-3" style="margin-top:8px;">
+            <div class="value-card" style="text-align:center;"><h5 style="margin:0;">Goodwill</h5></div>
+            <div class="value-card" style="text-align:center;"><h5 style="margin:0;">Deferred Income Taxes</h5></div>
+            <div class="value-card" style="text-align:center;"><h5 style="margin:0;">FX Adjustments</h5></div>
+            <div class="value-card" style="text-align:center;"><h5 style="margin:0;">R&amp;D Treatment</h5></div>
+            <div class="value-card" style="text-align:center;"><h5 style="margin:0;">Pension Expense</h5></div>
+            <div class="value-card" style="text-align:center;"><h5 style="margin:0;">Tangible Asset Revaluations</h5></div>
           </div>
         </div>
 
         <h4>Which ratios are most/least affected?</h4>
-        <div class="scale-track"><div class="scale-marker" style="left:8%;"></div><div class="scale-marker" style="left:82%;"></div></div>
-        <div class="scale-labels"><span>Least affected</span><span>Most affected</span></div>
+        <div class="pe-scale">
+          <div class="track">
+            <div class="marker" style="left:12%;" title="P/FCFE">A</div>
+            <div class="marker" style="left:82%; background:var(--rust);" title="P/B, P/E, P/EBITDA, EV/EBITDA">B</div>
+          </div>
+        </div>
+        <div class="pe-scale .track-labels" style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-dim); margin-top:2px;"><span>← Least affected (A = P/FCFE)</span><span>Most affected (B = P/B, P/E, P/EBITDA, EV/EBITDA) →</span></div>
         <table class="dtable" style="margin-top:16px;">
           <tr><th>Least affected</th><td><strong>P/FCFE</strong> — cash flow is much harder to distort via accounting choices than accrual-based figures.</td></tr>
           <tr><th>Most affected</th><td><strong>P/B, P/E, P/EBITDA, EV/EBITDA</strong> — all more heavily influenced by management's choice of accounting methods and estimates.</td></tr>
@@ -1230,7 +1276,8 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
 
     <!-- ============ LOS 20.q ============ -->
     <div class="view" id="view-q">
-      <span class="los-tag">LOS 20.q</span><span class="module-tag">MODULE 20.4</span>
+      <div class="module-tag">MODULE 20.4</div>
+      <span class="los-tag">LOS 20.q</span>
       <h1 class="section-title">Momentum Indicators</h1>
       <p class="section-sub">Describe momentum indicators and their use in valuation.</p>
       <div class="theory">
@@ -1263,7 +1310,8 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
 
     <!-- ============ LOS 20.r ============ -->
     <div class="view" id="view-r">
-      <span class="los-tag">LOS 20.r</span><span class="module-tag">MODULE 20.4</span>
+      <div class="module-tag">MODULE 20.4</div>
+      <span class="los-tag">LOS 20.r</span>
       <h1 class="section-title">Measures of Central Tendency for a Group of Multiples</h1>
       <p class="section-sub">Explain the use of the arithmetic mean, harmonic mean, weighted harmonic mean, and median to describe a group of multiples.</p>
       <div class="theory">
@@ -1274,27 +1322,37 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
         <div class="formula-box">
           <div class="eq">TRUE portfolio P/E = total price / total earnings = (10+16) / (1+2) = 26/3 = <strong>8.67×</strong></div>
         </div>
-        <div class="illus-block">
-          <div class="illus-title">Four ways to average the same two P/Es (10 and 8) — only one matches the true portfolio P/E of 8.67</div>
-          <table class="dtable">
+        <p class="illus-caption">Four ways to average the same two P/Es (10 and 8) — only one matches the true portfolio P/E of 8.67</p>
+        <table class="dtable">
             <tr><th>Measure</th><th>Calculation</th><th>Result</th></tr>
             <tr><td>Arithmetic mean</td><td>(10+8)/2</td><td>9.00</td></tr>
             <tr><td>Weighted arithmetic mean (by price weight: 10/26, 16/26)</td><td>(10/26)×10 + (16/26)×8</td><td>8.76</td></tr>
             <tr><td>Harmonic mean (equal-weighted)</td><td>2 / [(1/10)+(1/8)]</td><td>8.89</td></tr>
             <tr><td>Weighted harmonic mean (price-weighted)</td><td>1 / [(10/26)(1/10)+(16/26)(1/8)]</td><td><strong>8.67 ✓</strong></td></tr>
           </table>
-        </div>
+        
         <p class="nudge"><span class="ic">💡</span><span class="nudge-text"> The <strong>weighted harmonic mean exactly equals the true portfolio P/E</strong> (26/3 = 8.67) — this is not a coincidence, it's a mathematical identity. This is why it's the theoretically correct way to average a group of multiples.</span></p>
 
-        <div class="illus-block">
-          <div class="illus-title">Visualizing the spread — true portfolio P/E is 8.67×</div>
-          <div class="bar-chart">
-            <div class="bar-col"><div class="bv">9.00</div><div class="bar" style="height:88%; background:var(--rust);"></div><div class="bl">Arithmetic mean</div></div>
-            <div class="bar-col"><div class="bv">8.89</div><div class="bar" style="height:86%; background:var(--rust-soft); border:1px solid var(--rust);"></div><div class="bl">Harmonic mean</div></div>
-            <div class="bar-col"><div class="bv">8.76</div><div class="bar" style="height:83%; background:var(--surface-2);"></div><div class="bl">Weighted arith. mean</div></div>
-            <div class="bar-col"><div class="bv">8.67 ✓</div><div class="bar" style="height:80%; background:var(--green);"></div><div class="bl">Weighted harmonic mean</div></div>
+        <p class="illus-caption">Visualizing the spread — true portfolio P/E is 8.67×</p>
+        <div class="constraint-bars">
+          <div class="cbar-row">
+            <div class="cbar-label"><span>Arithmetic mean</span><span>9.00</span></div>
+            <div class="cbar-track"><div class="cbar-fill" style="width:100%; background:var(--rust);">9.00</div></div>
+          </div>
+          <div class="cbar-row">
+            <div class="cbar-label"><span>Harmonic mean</span><span>8.89</span></div>
+            <div class="cbar-track"><div class="cbar-fill" style="width:78%; background:var(--rust-soft);">8.89</div></div>
+          </div>
+          <div class="cbar-row">
+            <div class="cbar-label"><span>Weighted arithmetic mean</span><span>8.76</span></div>
+            <div class="cbar-track"><div class="cbar-fill" style="width:52%; background:var(--blue);">8.76</div></div>
+          </div>
+          <div class="cbar-row">
+            <div class="cbar-label"><span>Weighted harmonic mean ✓ (= true value)</span><span>8.67</span></div>
+            <div class="cbar-track"><div class="cbar-fill" style="width:34%; background:var(--green);">8.67</div></div>
           </div>
         </div>
+        
 
         <h4>When to use which measure</h4>
         <table class="dtable">
@@ -1633,9 +1691,9 @@ const PRACTICE = [
  ], final:`Trailing P/E = 22.5×; Leading P/E = 18.0×.`},
 
 {id:'p2', tag:'LOS 20.d', title:'P/B and P/S — Crisco Systems vs. Soothsayer Corp.',
- scenario:`<div class="table-scroll"><table class="mini"><tr><th>Company</th><th>Book Value of Equity ($M)</th><th>Sales ($M)</th><th>Shares (M)</th><th>Price</th></tr>
+ scenario:`<table class="mini"><tr><th>Company</th><th>Book Value of Equity ($M)</th><th>Sales ($M)</th><th>Shares (M)</th><th>Price</th></tr>
  <tr><td>Crisco Systems</td><td>$28,039</td><td>$18,878</td><td>7,001</td><td>$17.83</td></tr>
- <tr><td>Soothsayer Corp.</td><td>$6,320</td><td>$9,475</td><td>5,233</td><td>$12.15</td></tr></table></div>
+ <tr><td>Soothsayer Corp.</td><td>$6,320</td><td>$9,475</td><td>5,233</td><td>$12.15</td></tr></table>
  Calculate the P/B and P/S ratios for both companies.`,
  steps:[
   `Crisco book value per share = $28,039M / 7,001M = <b>$4.01</b>. Crisco P/B = $17.83 / $4.01 = <b>4.45×</b>.`,
@@ -1663,10 +1721,10 @@ const PRACTICE = [
  ], final:`Underlying earnings = C$5.75; trailing P/E (underlying) = 7.80×.`},
 
 {id:'p5', tag:'LOS 20.e', title:'Normalized Earnings — Magnolia Enterprises',
- scenario:`<div class="table-scroll"><table class="mini"><tr><th>Year</th><th>20X1</th><th>20X2</th><th>20X3</th><th>20X4</th></tr>
+ scenario:`<table class="mini"><tr><th>Year</th><th>20X1</th><th>20X2</th><th>20X3</th><th>20X4</th></tr>
  <tr><td>EPS</td><td>C$4.20</td><td>C$3.75</td><td>C$4.75</td><td>C$4.30</td></tr>
  <tr><td>BVPS</td><td>C$26.02</td><td>C$27.78</td><td>C$29.25</td><td>C$32.29</td></tr>
- <tr><td>ROE</td><td>14.0%</td><td>12.0%</td><td>16.0%</td><td>14.0%</td></tr></table></div>
+ <tr><td>ROE</td><td>14.0%</td><td>12.0%</td><td>16.0%</td><td>14.0%</td></tr></table>
  Calculate normalized EPS using both (1) the method of historical average EPS and (2) the method of average ROE.`,
  steps:[
   `Method 1 — historical average EPS: (4.20+3.75+4.75+4.30)/4 = <b>C$4.25</b>.`,
@@ -1745,7 +1803,7 @@ const PRACTICE = [
  ], final:`P/CF (using CF proxy) = 16.1×.`},
 
 {id:'p14', tag:'LOS 20.o', title:'EV/EBITDA — Boulevard Industries',
- scenario:`<div class="table-scroll"><table class="mini"><tr><td>Recent share price</td><td>Sf 22.50</td></tr><tr><td>Shares outstanding</td><td>40 million</td></tr><tr><td>Market value of debt</td><td>Sf 137 million</td></tr><tr><td>Cash &amp; marketable securities</td><td>Sf 62.3 million</td></tr><tr><td>Investments</td><td>Sf 327 million</td></tr><tr><td>Net income</td><td>Sf 137.5 million</td></tr><tr><td>Interest expense</td><td>Sf 6.9 million</td></tr><tr><td>D&amp;A</td><td>Sf 10.4 million</td></tr><tr><td>Taxes</td><td>Sf 95.9 million</td></tr></table></div>
+ scenario:`<table class="mini"><tr><td>Recent share price</td><td>Sf 22.50</td></tr><tr><td>Shares outstanding</td><td>40 million</td></tr><tr><td>Market value of debt</td><td>Sf 137 million</td></tr><tr><td>Cash &amp; marketable securities</td><td>Sf 62.3 million</td></tr><tr><td>Investments</td><td>Sf 327 million</td></tr><tr><td>Net income</td><td>Sf 137.5 million</td></tr><tr><td>Interest expense</td><td>Sf 6.9 million</td></tr><tr><td>D&amp;A</td><td>Sf 10.4 million</td></tr><tr><td>Taxes</td><td>Sf 95.9 million</td></tr></table>
  Calculate the EV/EBITDA ratio for Boulevard Industries.`,
  steps:[
   `Compute EBITDA: net income + interest + taxes + D&amp;A = 137.5+6.9+95.9+10.4 = <b>Sf 250.7M</b>.`,
@@ -1755,10 +1813,10 @@ const PRACTICE = [
  ], final:`EV/EBITDA = 2.6×.`},
 
 {id:'p15', tag:'LOS 20.l / 20.m', title:'Method of Comparables (P/E) — Allbright Interiors vs. Basic Designs',
- scenario:`<div class="table-scroll"><table class="mini"><tr><th></th><th>Trailing P/E</th><th>Leading P/E</th><th>5-yr growth</th><th>Beta</th></tr>
+ scenario:`<table class="mini"><tr><th></th><th>Trailing P/E</th><th>Leading P/E</th><th>5-yr growth</th><th>Beta</th></tr>
  <tr><td>Allbright</td><td>10.0</td><td>8.7</td><td>11.0%</td><td>1.3</td></tr>
  <tr><td>Basic Designs</td><td>14.0</td><td>12.7</td><td>9.0%</td><td>1.4</td></tr>
- <tr><td>Peer median</td><td>13.3</td><td>12.1</td><td>11.0%</td><td>1.3</td></tr></table></div>
+ <tr><td>Peer median</td><td>13.3</td><td>12.1</td><td>11.0%</td><td>1.3</td></tr></table>
  Evaluate each stock's valuation using the method of comparables.`,
  steps:[
   `Compare Allbright's P/E to the peer median: 10.0 vs. 13.3 → below the benchmark.`,
@@ -1771,9 +1829,9 @@ const PRACTICE = [
 
 {id:'p16', tag:'LOS 20.l / 20.m', title:'Method of Comparables (P/B & P/S) — Crisco & Soothsayer vs. Industry',
  scenario:`Recall Crisco's P/B = 4.45, P/S = 6.60 (Networking Products industry). Soothsayer's P/B = 10.04, P/S = 6.71 (Enterprise Software/Services industry).
- <div class="table-scroll"><table class="mini"><tr><th>Peer Group</th><th>Mean P/B</th><th>Median P/B</th><th>Mean P/S</th><th>Median P/S</th></tr>
+ <table class="mini"><tr><th>Peer Group</th><th>Mean P/B</th><th>Median P/B</th><th>Mean P/S</th><th>Median P/S</th></tr>
  <tr><td>Networking Products</td><td>2.065</td><td>1.170</td><td>3.733</td><td>0.900</td></tr>
- <tr><td>Enterprise Software/Services</td><td>7.866</td><td>2.770</td><td>3.341</td><td>1.920</td></tr></table></div>
+ <tr><td>Enterprise Software/Services</td><td>7.866</td><td>2.770</td><td>3.341</td><td>1.920</td></tr></table>
  Determine whether each stock is overvalued or undervalued relative to its peer group.`,
  steps:[
   `Compare Crisco's P/B (4.45) to its peer group: exceeds both mean (2.065) and median (1.170).`,
@@ -1786,9 +1844,9 @@ const PRACTICE = [
 
 {id:'p17', tag:'LOS 20.l / 20.n', title:"Comprehensive Vignette — Home Decor vs. Lester's",
  scenario:`Comparison per-share data:
- <div class="table-scroll"><table class="mini"><tr><th></th><th>Price</th><th>Trailing CF/sh</th><th>P/CF</th><th>Trailing FCFE/sh</th><th>P/FCFE</th><th>5-yr growth</th><th>Beta</th></tr>
+ <table class="mini"><tr><th></th><th>Price</th><th>Trailing CF/sh</th><th>P/CF</th><th>Trailing FCFE/sh</th><th>P/FCFE</th><th>5-yr growth</th><th>Beta</th></tr>
  <tr><td>Lester's</td><td>$47.8</td><td>$2.00</td><td>23.90</td><td>$0.36</td><td>132.78</td><td>17.5%</td><td>1.22</td></tr>
- <tr><td>Home Decor</td><td>$28.4</td><td>$1.36</td><td>20.88</td><td>$0.99</td><td>28.69</td><td>22.2%</td><td>1.36</td></tr></table></div>
+ <tr><td>Home Decor</td><td>$28.4</td><td>$1.36</td><td>20.88</td><td>$0.99</td><td>28.69</td><td>22.2%</td><td>1.36</td></tr></table>
  Home Decor is also trading at $28.40, currently at a P/B of 3.31 (91% of the home-improvement industry average of 3.62, forecasted ROE 19.29% ≈ industry's 19.29%). Lester's P/B is 4.32 (119% of the same industry average, forecasted ROE 18.90%, slightly below industry's 19.29%).
  <br><br>Separately, Lester's reports (in its financial statements): net income $1,023,262,000; depreciation $534,102,000; CFO $1,497,442,000; a $139,870,000 nonrecurring operating expense; 631,643,000 basic shares outstanding; marginal tax rate 37%; current price $42.10 (a different, more detailed data point than the $47.8 rounded figure above — use $42.10 for the P/CF/P/CFO calculations below).
  <br><br>Part 1: Using P/CF and P/FCFE, which stock looks more attractively valued? Part 2: Using P/B versus the industry and each other, which looks more attractively valued? Part 3: Calculate Lester's P/CF using earnings-plus-noncash-charges. Part 4: Calculate Lester's adjusted P/CFO after removing the nonrecurring expense (after-tax).`,
@@ -2000,11 +2058,11 @@ function renderOverviewRoadmap(){
   LOS_ORDER.forEach(sec=>{
     const st = sectionMasteryState(sec);
     const meta = LOS_META[sec];
-    html += `<button class="roadmap-item" data-view="${sec}"><span class="ic">${icons[st]}</span><span class="txt"><span class="ttl">LOS 20.${sec} — ${meta.title}</span><span class="sub">${FLASHCARDS[sec].length} flashcards</span></span><span class="arrow">${meta.icon}</span></button>`;
+    html += `<button class="roadmap-item" data-view="${sec}"><span class="ric">${icons[st]}</span><span class="rit">LOS 20.${sec} — ${meta.title}<span class="risub">${FLASHCARDS[sec].length} flashcards</span></span><span class="rarrow">${meta.icon}</span></button>`;
   });
-  html += `<button class="roadmap-item" data-view="review"><span class="ic">🔁</span><span class="txt"><span class="ttl">Spaced Review</span><span class="sub">${dueCount()} cards due now</span></span><span class="arrow">→</span></button>`;
-  html += `<button class="roadmap-item" data-view="quiz"><span class="ic">📝</span><span class="txt"><span class="ttl">Module Quiz</span><span class="sub">${QUIZ.length} questions</span></span><span class="arrow">→</span></button>`;
-  html += `<button class="roadmap-item" data-view="practice"><span class="ic">🧮</span><span class="txt"><span class="ttl">Practice Problems</span><span class="sub">${PRACTICE.length} step-reveal problems</span></span><span class="arrow">→</span></button>`;
+  html += `<button class="roadmap-item" data-view="review"><span class="ric">🔁</span><span class="rit">Spaced Review<span class="risub">${dueCount()} cards due now</span></span><span class="rarrow">→</span></button>`;
+  html += `<button class="roadmap-item" data-view="quiz"><span class="ric">📝</span><span class="rit">Module Quiz<span class="risub">${QUIZ.length} questions</span></span><span class="rarrow">→</span></button>`;
+  html += `<button class="roadmap-item" data-view="practice"><span class="ric">🧮</span><span class="rit">Practice Problems<span class="risub">${PRACTICE.length} step-reveal problems</span></span><span class="rarrow">→</span></button>`;
   container.innerHTML = html;
   container.querySelectorAll('.roadmap-item[data-view]').forEach(btn=>{
     btn.addEventListener('click', ()=> navigateTo(btn.getAttribute('data-view')) );
@@ -2013,19 +2071,21 @@ function renderOverviewRoadmap(){
 
 // ============ STATS / NAV DOTS ============
 function updateStatsBar(){
-  document.getElementById('mastery-pct').textContent = masteryPercent()+'%';
-  document.getElementById('due-count').textContent = dueCount();
-  const ov = document.getElementById('ov-cardcount');
-  if(ov) ov.textContent = ALL_CARDS.length;
+  document.getElementById('stat-mastery').textContent = masteryPercent()+'%';
+  document.getElementById('stat-due').textContent = dueCount();
+  const ovc = document.getElementById('ov-cards'); if(ovc) ovc.textContent = ALL_CARDS.length;
+  const ovq = document.getElementById('ov-quiz'); if(ovq) ovq.textContent = QUIZ.length;
+  const ovp = document.getElementById('ov-practice'); if(ovp) ovp.textContent = PRACTICE.length;
 }
 function updateNavDots(){
   LOS_ORDER.forEach(sec=>{
     const st = sectionMasteryState(sec);
-    document.querySelectorAll('.mastery-dot[data-sec="'+sec+'"]').forEach(dot=>{
+    const dot = document.getElementById('dot-'+sec);
+    if(dot){
       dot.classList.remove('started','mastered');
       if(st==='started') dot.classList.add('started');
       if(st==='mastered') dot.classList.add('mastered');
-    });
+    }
   });
   renderOverviewRoadmap();
 }
@@ -2215,9 +2275,10 @@ document.addEventListener('keydown', (e)=>{
 
 // ============ FIREBASE SYNC ============
 function setSyncStatus(text, ok){
-  document.getElementById('sync-status').textContent = text;
-  const dot = document.getElementById('sync-dot');
-  if(dot) dot.style.background = ok===false ? 'var(--rust)' : 'var(--green)';
+  const el = document.getElementById('sync-status');
+  const line = document.getElementById('sync-line');
+  if(el) el.textContent = text;
+  if(line) line.classList.toggle('offline', ok===false);
 }
 function cacheState(){
   try{ localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(state)); }
