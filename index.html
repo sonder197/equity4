@@ -816,7 +816,7 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
           <li>A <strong>low E/P</strong> suggests an <strong>expensive</strong> security.</li>
         </ul>
         <p>Securities can therefore be ranked from cheap to expensive based on E/P ratios — including firms with losses, where a negative E/P still ranks sensibly (a very negative E/P is clearly worse than a small positive one), unlike a negative P/E which just produces a nonsensical negative multiple.</p>
-        <p class="nudge"><span class="ic">💡</span><span class="nudge-text"> E/P also appears later in the <strong>Fed model</strong> (LOS 20.g/h territory): comparing the market's earnings yield to the 10-year Treasury yield to judge broad-market over/undervaluation.</span></p>
+        <p class="nudge"><span class="ic">💡</span><span class="nudge-text"> E/P also appears later in the <strong>Fed model</strong> (LOS 20.g): comparing the market's earnings yield to the 10-year Treasury yield to judge broad-market over/undervaluation.</span></p>
       </div>
 
       <div class="deck-block">
@@ -853,6 +853,31 @@ table.mini td:first-child, table.mini th:first-child{text-align:left; font-famil
           <span class="callout-label">P/S specifically — two channels for profit margin</span>
           <p>Justified P/S = (E₀/S₀) × (1−b) × (1+g) / (r−g). Net profit margin (E₀/S₀) influences P/S <strong>directly</strong> (it's a factor in the numerator) <em>and</em> <strong>indirectly</strong> through its effect on the sustainable growth rate g (since g = retention ratio × ROE, and ROE embeds profit margin via DuPont).</p>
         </div>
+
+        <h4>Dividend yield: the Fed model and the Yardeni model</h4>
+        <p>These two models explain the fundamental factors driving the <strong>market-level</strong> P/E and earnings yield — a direct extension of the r-and-g logic above, applied to a broad index instead of a single stock.</p>
+
+        <div class="callout">
+          <span class="callout-label">The Fed model</span>
+          <p>Compares the market's earnings yield to the yield on long-term government bonds: if the <strong>earnings yield (E/P) on the S&amp;P 500 Index is less than the yield on 10-year U.S. Treasury bonds</strong>, the equity market is considered <strong>overvalued</strong> (and vice versa — a higher E/P than the bond yield signals undervaluation).</p>
+        </div>
+
+        <div class="formula-box">
+          <div class="label">The Yardeni model — refines the Fed model by adding a growth term</div>
+          <div class="eq">CEY = CBY − k × LTEG + ε<sub>i</sub></div>
+          <div class="fdef">
+            <div><b>CEY</b> = current earnings yield of the market</div>
+            <div><b>CBY</b> = current Moody's A-rated corporate bond yield</div>
+            <div><b>LTEG</b> = five-year consensus earnings growth rate</div>
+            <div><b>k</b> = constant assigned by the market to earnings growth (about 0.20 in recent years)</div>
+          </div>
+        </div>
+        <div class="formula-box">
+          <div class="label">Rearranged in terms of P/E</div>
+          <div class="eq">P/E = 1 / (CBY − k × LTEG)</div>
+          <div class="fdef"><div>⇒ the market P/E ratio is <b>negatively related to interest rates</b> (CBY) and <b>positively related to growth</b> (LTEG) — the same two levers as every justified-multiple formula elsewhere in this reading, just applied at the index level.</div></div>
+        </div>
+        <p class="nudge"><span class="ic">💡</span><span class="nudge-text"> The Yardeni model is essentially the Fed model with a growth adjustment bolted on — it uses a corporate bond yield (CBY) instead of the Treasury yield, and explicitly subtracts a growth term (k×LTEG) so that expected earnings growth lowers the "fair" earnings yield (equivalently, raises the justified P/E). This is why higher growth ⇒ higher P/E holds at the market level too, not just for individual stocks.</span></p>
 
         <p class="nudge"><span class="ic">✅</span><span class="nudge-text"> Quiz yourself: for each of the six rows above, can you explain <em>why</em> the relationship holds by tracing it back to the Gordon growth formula V₀ = D₁/(r−g)? If you can derive it, you don't need to memorize it.</span></p>
       </div>
@@ -1454,6 +1479,8 @@ g: [
   {id:'g4', q:`What drives the justified P/CF ratio?`, a:`P/CF increases when the <b>required return decreases</b> or the <b>growth rate increases</b>.`},
   {id:'g5', q:`What drives the justified EV/EBITDA ratio?`, a:`<b>Positively</b> related to the growth rate in FCFF and EBITDA; <b>negatively</b> related to the firm's overall risk and WACC.`},
   {id:'g6', q:`What drives the justified dividend yield?`, a:`<b>Positively</b> related to the required rate of return (r); <b>negatively</b> related to the forecasted growth rate in dividends.`},
+  {id:'g7', q:`State the Fed model's rule for judging whether the equity market is over- or undervalued.`, a:`If the <b>earnings yield (E/P) on the S&P 500</b> is <b>less than</b> the yield on <b>10-year U.S. Treasury bonds</b>, the market is <b>overvalued</b> (and vice versa).`},
+  {id:'g8', q:`Write the Yardeni model equation and what P/E is negatively/positively related to under it.`, a:`CEY = CBY − k×LTEG + εᵢ, so P/E = 1/(CBY − k×LTEG). P/E is <b>negatively related to interest rates</b> (CBY) and <b>positively related to growth</b> (LTEG).`},
 ],
 h: [
   {id:'h1', q:`Define a cross-sectional regression.`, a:`A regression in which the explained and explanatory variables are <b>all measured at the same point in time</b> (e.g., across many peer firms today).`},
